@@ -7,9 +7,17 @@ disable-model-invocation: true
 
 # Main Adaptive Learning Session
 
-The flagship command. Interleaves skills, adapts difficulty per answer, and covers the whole evidence-based loop: active recall → immediate feedback → spaced repetition → tracking.
+## Overview
 
-## Protocol
+The flagship command. Interleaves skills, adapts difficulty per answer, and covers the whole evidence-based loop: active recall → immediate feedback → spaced repetition → tracking. Typically runs 15-20 min, mixing 2-3 patterns to force discrimination.
+
+## When to Use
+
+Trigger this skill only when the learner types `/learn`. The skill is gated with `disable-model-invocation: true` — an ambiguous auto-trigger would launch a 20-min interactive session and mutate 6 JSON databases.
+
+Skip this skill the very first time a learner runs the system — route to `/setup` instead.
+
+## Instructions
 
 ### 1. Load learner context
 
@@ -52,7 +60,7 @@ Need all 6 DBs. If any missing, direct the learner to `/setup` and stop.
 
 ### 4. Route
 
-- 1-5 → run the matching skill's protocol (`writing`, `speaking`, `vocab`, `reading`, `review`). Those skills cover everything needed; this skill's job here is just to dispatch.
+- 1-5 → hand off to the matching skill (`writing`, `speaking`, `vocab`, `reading`, `review`). Those skills cover everything needed; this skill's job here is just to dispatch.
 - 6 (adaptive mix) → use this skill's own exercise sequencer (below).
 
 ### 5. Adaptive mix (option 6)
@@ -77,6 +85,7 @@ After every 3-4 exercises, check rolling accuracy:
 - **>70%** → raise difficulty (longer sentences, less scaffolding, rarer vocabulary)
 
 Formula reference:
+
 ```
 if mastery_level <= 1:
     difficulty = "easy"
@@ -91,8 +100,11 @@ elif mastery_level >= 4:
 ### 7. Exercise types by skill
 
 **Writing**: sentence completion, translation, error correction, full email, reordering.
+
 **Speaking**: personal Qs, picture description, role-play, phonetic typing.
+
 **Vocabulary**: recognition, production, cloze, associations, synonym matching.
+
 **Reading**: short text + comprehension, cloze paragraph, true/false, summarization.
 
 ### 8. Per-answer feedback
@@ -127,7 +139,8 @@ Now type the correct version yourself: "{correct_sentence}"
 {goodbye in target language}! 👏
 ```
 
-Then call `db-updater`:
+Then use the `db-updater` skill:
+
 - `command_used: "/learn"`
 - `skills_practiced: [all skills touched]`
 - `skill_scores` per skill
@@ -136,9 +149,44 @@ Then call `db-updater`:
 
 Save exchange to `/results/learn-session-{NNN}.md`.
 
+## Examples
+
+### Example 1 — greeting for an active learner
+
+> # Goedemorgen, Mohammad! 👋
+>
+> **Today's Status:**
+> - 🔥 Streak: 6 days
+> - 📚 Review items due: 6
+> - 🎯 Focus area: formal_informal confusion (5 total occurrences)
+> - ⭐ Level: A1 → A2 (38%)
+>
+> **What would you like to practice today?**
+>
+> 1. 📝 Writing (emails, letters, forms)
+> 2. 🗣️ Speaking (typed conversation)
+> 3. 📖 Vocabulary (flashcard drills)
+> 4. 👀 Reading (comprehension)
+> 5. 🔄 Spaced Review (today's due items)
+> 6. 🎲 Surprise me! (adaptive mix)
+>
+> **Type a number or skill name:**
+
+### Example 2 — adaptive mix mid-session
+
+After 4 exercises, accuracy is 55% (target zone). Hold difficulty; introduce pattern #2:
+
+> Nice — you're right in the sweet spot. Let's switch patterns now.
+>
+> ## Exercise 5: `omdat` word order
+>
+> Rewrite this correctly: "omdat ik ben te laat"
+>
+> **Type your answer:**
+
 ## Critical Rules
 
-- **Never auto-invoke.** This session is 15-20 min + DB writes; false positives are costly.
+- **Never auto-invoke.** Gated; 15-20 min interactive + DB writes.
 - **Always load all 6 DBs at start.** Missing context → generic, demotivating content.
 - **One exercise at a time.**
 - **Interleave.** Don't drill one pattern for 20 min — mix 2-3 patterns to force discrimination.

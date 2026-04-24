@@ -7,9 +7,17 @@ disable-model-invocation: true
 
 # Vocabulary Drill Session
 
-Flashcard-style practice using spaced repetition. One word at a time, immediate feedback, DB update at the end.
+## Overview
 
-## Protocol
+Flashcard-style vocabulary practice using spaced repetition. One word at a time, immediate feedback, DB update at the end. Interleaves three modes (recognition, production, cloze) to force active recall rather than passive re-reading.
+
+## When to Use
+
+Trigger this skill only when the learner types `/vocab`. The skill is gated with `disable-model-invocation: true` — a false-positive auto-trigger would launch a 15-min interactive session and mutate 6 JSON databases. Not worth the risk.
+
+Skip this skill if no vocabulary items are due and no new words are queued — offer `/review` or `/learn` instead.
+
+## Instructions
 
 ### 1. Load vocabulary data
 
@@ -17,13 +25,14 @@ Flashcard-style practice using spaced repetition. One word at a time, immediate 
 python3 .claude/hooks/read-db.py
 ```
 
-If the helper is unavailable:
+If the helper is unavailable, read:
+
 - `data/spaced-repetition.json`
 - `data/mistakes-db.json`
 - `data/mastery-db.json`
 - `data/learner-profile.json` (for target_language, name, level)
 
-If any missing, direct the learner to `/setup` and stop.
+If any are missing, direct the learner to `/setup` and stop.
 
 ### 2. Select words
 
@@ -37,7 +46,7 @@ Limit: `spaced-repetition.daily_limits.review_items_per_day` (default 20).
 
 ### 3. Present one word at a time
 
-Rotate the three modes so the session is not monotonous:
+Rotate the three modes so the session is not monotonous.
 
 **Recognition** (target_language → native):
 
@@ -79,12 +88,13 @@ Rotate the three modes so the session is not monotonous:
 **Type the missing word:**
 ```
 
-### 4. After each answer
+### 4. Feedback after each answer
 
 Use the `feedback-formatter` skill's template. Score out of 10, tag severity.
 
 Track the answer for the end-of-session DB update:
-- Add to `review_results[]` with `quality = floor(score / 2)`.
+
+- Add to `review_results[]` with `quality = floor(score / 2)` (see `sm2-calculator` skill).
 - If the learner met a new word, stage it for `new_vocabulary[]`.
 - If the learner made an error, stage it for `errors[]`.
 
@@ -113,12 +123,68 @@ Do **not** call `update-db.py` after every word — batch at session end.
 ### 6. Update all databases
 
 Call the `db-updater` skill's workflow — one `update-db.py` invocation with:
+
 - `session_id`, `date`, `duration_minutes`
 - `command_used: "/vocab"`
 - `skills_practiced: ["vocabulary"]`
 - `skill_scores.vocabulary`: `{exercises, correct, time_minutes}`
 - `errors[]`, `new_vocabulary[]`, `review_results[]` collected during the session
 - `focus_next_session[]` — top 2-3 weak words
+
+## Examples
+
+### Example 1 — recognition drill
+
+> ## Word 1/15
+>
+> **Dutch:** de keuken
+>
+> **Context:** "De keuken is klein maar mooi."
+>
+> **What does it mean in English?**
+>
+> Type your answer:
+
+Learner: "the kitchen"
+
+> ✅ Exactly.
+>
+> **Answer:** the kitchen
+> **Meaning:** A room used for cooking and food preparation.
+> **Example:** "De keuken is klein maar mooi." (The kitchen is small but pretty.)
+>
+> **Score: 10/10** 🎯
+>
+> ---
+
+### Example 2 — production with error
+
+> ## Word 7/15
+>
+> **English:** to write
+>
+> **How do you say this in Dutch?**
+
+Learner: "schrijven"
+
+> ✅ Correct — infinitive form.
+>
+> Now: can you also give the first-person present? (I write → …)
+
+### Example 3 — session end summary
+
+> ## 📚 Vocabulary Session Complete!
+>
+> **Words Reviewed:** 15
+> **Accuracy:** 80% (12/15)
+> **New Words Learned:** 3
+> **Words Mastered:** 1
+>
+> **Need more practice:** de sleutel, het raam, gisteren
+>
+> **Next review:** Tomorrow 4 words, this week 8 words.
+>
+> Goed gedaan! 🌟
 
 ## Critical Rules
 
@@ -127,6 +193,7 @@ Call the `db-updater` skill's workflow — one `update-db.py` invocation with:
 - **Mix modes.** Don't drill 20 recognition prompts in a row — interleave for discrimination.
 - **Use target language** for greetings + transitions when the learner is B1+; for A1-A2 mix target + native.
 - **Never** update the DBs mid-session — batch at end.
+- **Never auto-invoke.** This skill is gated; must fire only on explicit `/vocab`.
 
 ## Tips for the Learner (append if they seem tired or unsure)
 

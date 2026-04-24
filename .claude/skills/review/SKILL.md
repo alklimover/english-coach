@@ -7,9 +7,17 @@ disable-model-invocation: true
 
 # Spaced-Repetition Review Session
 
-Replay items the learner learned before, timed so they hit just before the forgetting curve drops them. This is the single most effective session type — the system depends on it running daily.
+## Overview
 
-## Protocol
+Replay items the learner learned before, timed so they hit just before the forgetting curve drops them. This is the single most effective session type — the system depends on it running daily. Items the learner gets right get pushed further into the future; items they miss come back tomorrow.
+
+## When to Use
+
+Trigger this skill only when the learner types `/review`. The skill is gated with `disable-model-invocation: true` — mutating SM-2 state from a misread prompt would cascade through every future session.
+
+Skip this skill when the queue is empty — suggest `/vocab` or `/learn` instead.
+
+## Instructions
 
 ### 1. Load review queue
 
@@ -19,7 +27,7 @@ python3 .claude/hooks/read-db.py
 
 Read `spaced-repetition.review_queue.today` and `daily_limits.review_items_per_day`. Sort items by `priority` (critical → high → medium → low). Cap at the daily limit (usually 20).
 
-If the queue is empty, tell the learner and suggest a different command:
+If the queue is empty:
 
 ```markdown
 🎉 No reviews due today! Your spaced repetition is up to date.
@@ -45,9 +53,10 @@ Why review? Spaced repetition prevents forgetting, moves items into long-term me
 **Ready? Let's start!** 💪
 ```
 
-### 3. For each queue item
+### 3. Generate exercise per item
 
 Each item has:
+
 ```json
 {
   "item_id": "...",
@@ -84,7 +93,7 @@ Present one at a time:
 
 ### 4. Evaluate + update SM-2
 
-Use `feedback-formatter` for the per-answer feedback.
+Use the `feedback-formatter` skill for per-answer feedback.
 
 Then stage the item for the end-of-session update. Do NOT hand-edit `spaced-repetition.json` — use `review_results[]` in the `db-updater` payload:
 
@@ -135,7 +144,8 @@ Keep going! 💪
 
 ### 7. Update all databases
 
-Call `db-updater`:
+Use the `db-updater` skill:
+
 - `command_used: "/review"`, `skills_practiced: [derived from reviewed items]`
 - `skill_scores` — aggregate per skill touched
 - `review_results[]` — every item reviewed, with `quality`
@@ -144,23 +154,65 @@ Call `db-updater`:
 
 Save exchange to `/results/review-session-{NNN}.md` for later analysis.
 
-## SM-2 Queue Reshelving
+## Examples
 
-After each item:
-- quality ≥ 3 → new `interval_days` computed, move to `tomorrow` / `this_week` / `later` based on the interval.
-- quality < 3 → `interval_days = 1`, `repetitions = 0`, stay in `today` (so the learner sees it again this session).
+### Example 1 — vocabulary review with wrong answer
 
-Details in the `sm2-calculator` skill. The script handles this — do not re-implement.
+> ## Review 3/12 — 🔴
+>
+> **Type:** vocabulary
+> **Last reviewed:** 6 days ago
+> **Current mastery:** ⭐⭐⭐☆☆
+>
+> **Dutch:** het raam
+>
+> **What does it mean in English?**
+
+Learner: "the door"
+
+> ❌ Close — those are both openings in a wall, but not the same.
+>
+> **Corrections:**
+> - 🟡 "the door" → **"the window"** (vocabulary — `het raam` is window; `de deur` is door)
+>
+> **Correct version:**
+> "het raam" = the window.
+>
+> **Score: 3/10** 💪 Easy to mix — we'll review this again soon.
+>
+> (Logged: `review_results[]` item quality=1 → `interval_days=1, repetitions=0`, stays in today's queue.)
+
+### Example 2 — correct answer with mastery bump
+
+> ## Review 7/12 — 🟡
+>
+> **Type:** grammar_rule
+> **Last reviewed:** 14 days ago
+> **Current mastery:** ⭐⭐⭐⭐☆
+>
+> **Complete:** "Ik schrijf u omdat ik ____ kan komen." (reason: can't come)
+
+Learner: "niet"
+
+> ✅ Perfect — omdat-clause word order locked in.
+>
+> **Answer:** "Ik schrijf u omdat ik niet kan komen."
+>
+> **Score: 10/10** 🎯
+>
+> (Logged: quality=5 → `interval_days = round(14 * EF)`, queue: `later`. `consecutive_correct` = 5, mastery → 5 ⭐⭐⭐⭐⭐.)
 
 ## Critical Rules
 
 - **Daily.** The whole system assumes the learner runs `/review` every day. Missing a day breaks the intended spacing.
-- **Honor `disable-model-invocation`.** This session is long and mutates SM-2 state. Never auto-start.
+- **Never auto-invoke.** Gated; must fire only on explicit `/review`. Long interactive + SM-2 mutation.
 - **One item at a time.** Rushing = false positives.
 - **Let the learner struggle.** If they don't remember, that's useful data (quality 0-2). The algorithm needs honest signals.
 - **Never hand-edit `spaced-repetition.json`.** Queue is rebuilt on every `update-db.py` call.
 
-## What the Schedule Means (tell the learner if they ask)
+## What the Schedule Means
+
+Tell the learner if they ask:
 
 - 1 day — new or struggling items
 - 2-3 days — learning, building strength

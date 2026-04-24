@@ -14,7 +14,10 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-DATA_DIR = Path("data")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fluent_paths import data_dir  # noqa: E402
+
+DATA_DIR = data_dir()
 
 FILES = {
     "learner_profile": DATA_DIR / "learner-profile.json",

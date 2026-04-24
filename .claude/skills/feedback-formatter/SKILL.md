@@ -1,14 +1,27 @@
 ---
 name: feedback-formatter
-description: Canonical feedback template for every learner answer in the Fluent system — celebrate correct parts, correct mistakes with category + brief explanation, show full correct version, score out of 10, and classify severity (🔴 critical / 🟡 moderate / 🟢 minor). Use in every practice session (writing, vocab, speaking, reading, review) immediately after the learner submits an answer.
-user-invocable: false
+description: Canonical feedback template for every learner answer in the Fluent system — celebrate correct parts, correct mistakes with category and brief explanation, show the full correct version, score out of 10, and classify severity (🔴 critical / 🟡 moderate / 🟢 minor). Use in every practice session (writing, vocab, speaking, reading, review) immediately after the learner submits an answer.
 ---
 
 # Feedback Formatter
 
-Every practice session ends each turn with immediate feedback. Consistency matters: the learner builds mental models from the structure, and the error patterns we mine from session files depend on predictable markers (❌, ✅, severity emoji).
+## Overview
 
-## Standard Template
+Every practice session ends each turn with immediate feedback. Consistency matters — the learner builds mental models from the structure, and error patterns we mine from session files depend on predictable markers (❌, ✅, severity emoji). This skill defines the single feedback shape used across all Fluent practice skills.
+
+## When to Use
+
+Load this skill whenever the tutor:
+
+- Grades a learner answer in any practice skill (`learn`, `vocab`, `writing`, `speaking`, `reading`, `review`).
+- Needs to classify an error by severity before writing to `mistakes-db.json`.
+- Needs to tag an error by category (grammar, vocabulary, prepositions, etc.).
+
+Skip this skill for non-feedback output (greetings, summaries, progress reports).
+
+## Instructions
+
+### 1. Standard template
 
 ```markdown
 {✅ or ❌} {one-line encouragement or gentle correction}
@@ -25,11 +38,9 @@ Every practice session ends each turn with immediate feedback. Consistency matte
 ---
 ```
 
-Skip the ❌ block if the answer was fully correct; skip the ✅ block only if truly nothing was right (rare — usually at least word order or intent was right).
+Skip the ❌ block if the answer is fully correct. Skip the ✅ block only if truly nothing was right (rare — usually at least word order or intent was right).
 
-## Severity Markers
-
-Classify each ❌ error and tag it inline:
+### 2. Tag severity on every error
 
 | Symbol | Severity | Meaning | Example |
 |--------|----------|---------|---------|
@@ -39,9 +50,9 @@ Classify each ❌ error and tag it inline:
 
 A single answer may contain multiple errors of different severity — tag each.
 
-## Category Labels
+### 3. Use these category labels
 
-Use these when explaining corrections (fed into `mistakes-db.json`):
+These feed `mistakes-db.json`:
 
 - `grammar` — word order, conjugation, clause structure
 - `formal_informal` — u/je, uw/jouw, register mismatch
@@ -51,49 +62,33 @@ Use these when explaining corrections (fed into `mistakes-db.json`):
 - `articles` — de/het, definite/indefinite
 - `missing` — omitted greeting, closing, required word
 
-## Tone Rules
+### 4. Tone rules
 
 - **Encourage before correcting.** Open with a ✅ or a warm ❌ (`"Close! Let's tune one word."`), not a bare `Wrong.`.
-- **Explain why, not just what.** `"Ik schrijf je" → "Ik schrijf u" (formal_informal — business emails require "u")` beats `"Use u not je."`.
-- **Name the pattern.** Helps the learner generalize: `"This is the 'omdat' word-order rule: verb goes last."`.
-- **Celebrate progress.** `"You didn't miss this last time — well done."` when mistakes-db shows improvement.
+- **Explain why, not just what.** `"Ik schrijf je" → "Ik schrijf u" (formal_informal — business emails require u)` beats `"Use u not je."`.
+- **Name the pattern.** Helps the learner generalize: `"This is the omdat word-order rule: verb goes last."`.
+- **Celebrate progress.** `"You didn't miss this last time — well done."` when `mistakes-db` shows improvement.
 - **Emojis on.** The learner's profile has `use_emojis: true` by default. Keep them.
+
+### 5. Hand score to SM-2
+
+After scoring, feed the score into the SM-2 update via the `sm2-calculator` skill: `quality = floor(score / 2)`.
 
 ## Examples
 
-### Mostly correct
+See `.claude/references/feedback-template.md` for fully-rendered examples (mostly-correct answer with a minor slip; critical error with severity tagging). The reference file is the authoritative version — keep it and this skill in sync if updating.
 
-> ✅ Nice — past tense is solid.
->
-> **Corrections:**
-> - 🟢 "gestern" → **"hier"** (vocabulary — small slip, you used the German word)
-> - ✅ "Ik ben gegaan" — perfect auxiliary + participle
->
-> **Correct version:**
-> "Ik ben hier naar de markt gegaan."
->
-> **Score: 9/10** 🎯 One minor swap — don't sweat it.
->
-> ---
+Quick pattern:
 
-### Critical error
+- Fully correct: open with ✅, skip ❌ block, list 1-2 ✅ strengths, show "Correct version" for echo, score 9-10/10.
+- Mistakes: open with warm ❌, list each correction with severity emoji + category + brief why, show full correct version, score with breakdown if the answer is long.
 
-> ❌ Close, but one pattern is costing you points on the exam.
->
-> **Corrections:**
-> - 🔴 "Ik schrijf je omdat ik heb een vraag" → **"Ik schrijf u omdat ik een vraag heb"** (formal_informal + grammar — formal register needs "u", and "omdat" pushes the verb to the end)
-> - ✅ "Ik schrijf" — correct opening verb
->
-> **Correct version:**
-> "Ik schrijf u omdat ik een vraag heb."
->
-> **Score: 5/10** 💪 Two patterns to drill — both fixable.
->
-> ---
+## Critical Rules
 
-## Score → SM-2 Quality
-
-After scoring, feed the score into the SM-2 update (see the `sm2-calculator` skill). Quality = `floor(score / 2)`.
+- **Always use the template exactly.** Deviations break session-file parsing downstream.
+- **Severity tag is mandatory** on every ❌ line. Drives spaced-repetition priority.
+- **One score per answer.** Total out of 10, with optional breakdown (grammar/vocab/structure) for long answers like writing tasks.
+- **Never skip the "Correct version".** Even if perfect, echoing the target form reinforces motor memory.
 
 ## Why This Matters
 

@@ -4,21 +4,26 @@ description: Show the learner's language learning progress, statistics, mastery 
 allowed-tools: Read, Bash
 ---
 
-# Language Learning Progress Dashboard
+# Progress Dashboard
+
+## Overview
 
 Show the learner a comprehensive, personalized progress report with visual statistics, skill mastery levels, trends, and next goals. This is read-only: do not modify any database files.
 
 ## When to Use
 
 Trigger this skill when:
-- Learner types `/progress`
-- Learner asks about their progress, statistics, streak, mastery, achievements, or how they're improving
-- Learner asks "how am I doing" / "show me my stats" / "am I getting better"
-- After a session ends, if the learner wants a broader view than the session summary
 
-## Protocol
+- Learner types `/progress`.
+- Learner asks about their progress, statistics, streak, mastery, achievements, or how they're improving.
+- Learner asks "how am I doing", "show me my stats", "am I getting better".
+- After a session ends, if the learner wants a broader view than the session summary.
 
-### 1. Load all 6 databases in one call
+Skip this skill when the learner is mid-practice — the ongoing session skill already shows per-turn feedback, and opening the full dashboard interrupts the flow.
+
+## Instructions
+
+### 1. Load all 6 databases
 
 Prefer the helper script over manual Read calls:
 
@@ -29,6 +34,7 @@ python3 .claude/hooks/read-db.py
 This returns a single JSON with all 6 databases + computed fields (`due_reviews_count`, `next_session_id`, `streak_active`, `days_since_last_session`).
 
 If the helper is unavailable, fall back to reading each file directly:
+
 - `data/learner-profile.json`
 - `data/progress-db.json`
 - `data/mastery-db.json`
@@ -164,7 +170,7 @@ Use this exact structure. Fill in values from the databases; compute percentages
 "{personalized motivational message}"
 ```
 
-### 3. Interpretation footer
+### 3. Optional interpretation footer
 
 Append this only if the learner seems new or asks what the numbers mean:
 
@@ -181,12 +187,35 @@ Append this only if the learner seems new or asks what the numbers mean:
 **Accuracy bands:** 0-40% intensive, 40-60% learning, 60-75% good, 75-85% strong, 85%+ excellent.
 ```
 
+## Examples
+
+### Example 1 — minimal (A1 learner, week 1)
+
+> # 📊 Mohammad's Dutch Learning Dashboard
+>
+> **Current Level:** A1 → A2 (4% to A2)
+> **Current Streak:** 🔥 3 days
+> **Total Sessions:** 3 · 45 min
+>
+> ### Vocabulary 📚
+> **Level:** 1/5 ⭐☆☆☆☆ · 12 words known · 0 mastered
+>
+> Speaking / Writing / Reading: Not yet practiced.
+>
+> **Items Due Today:** 6 — run `/review` first.
+>
+> "Three days in a row — momentum matters. Keep going!"
+
+### Example 2 — trigger on natural-language question
+
+Learner: "how am I doing on Dutch?" → auto-invoke this skill, render the full dashboard.
+
 ## Critical Rules
 
 - **Read-only.** Never call `update-db.py` or edit any JSON in `data/`.
-- **Use current streak value from `learner-profile.json`.** Never guess or increment.
+- **Use the current streak value** from `learner-profile.json`. Never guess or increment.
 - **Use `day` vs `days`** correctly (1 = day, else days).
-- **Skip sections with no data.** If speaking not practiced, show "Not yet practiced" — don't fabricate numbers.
+- **Skip sections with no data.** If speaking hasn't been practiced, show "Not yet practiced" — don't fabricate numbers.
 - **Cite the learner by name** from `learner-profile.json`.
 - **Use target-language greetings** where natural (e.g. "Goed gedaan!" for Dutch).
 

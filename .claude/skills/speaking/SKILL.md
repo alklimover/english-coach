@@ -1,15 +1,23 @@
 ---
 name: speaking
-description: Run an interactive typed conversation session simulating spoken practice — free-flowing dialogue, role-plays, and opinion questions prioritizing communication over perfect grammar. Triggered only when the learner types /speaking. Asks questions one at a time in the target language, evaluates clarity + naturalness first and grammar second, and updates all databases at the end.
+description: Run an interactive typed conversation session simulating spoken practice — free-flowing dialogue, role-plays, and opinion questions prioritizing communication over perfect grammar. Triggered only when the learner types /speaking. Asks questions one at a time in the target language, evaluates clarity and naturalness first and grammar second, and updates all databases at the end.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
 
 # Speaking Practice (Typed)
 
-Conversational practice through typed dialogue. Unlike `/writing`, prioritize **communication and naturalness** — grammar errors that don't block meaning are downplayed.
+## Overview
 
-## Protocol
+Conversational practice through typed dialogue. Unlike `/writing`, prioritize **communication and naturalness** — grammar errors that don't block meaning are downplayed. Goal: build the learner's confidence to produce target-language output without over-analyzing.
+
+## When to Use
+
+Trigger this skill only when the learner types `/speaking`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+
+Skip this skill below A1 mastery 2 — the learner needs a basic word bank and verb conjugations first (run `/vocab` a few times).
+
+## Instructions
 
 ### 1. Load context
 
@@ -123,12 +131,6 @@ Ready? I'll start...
 **Your turn:**
 ```
 
-Example scenarios:
-- Supermarket: find bread, ask for help
-- Doctor: make an appointment by phone
-- Restaurant: order + ask about vegetarian options
-- Lost tourist: ask directions to the station
-
 ### 7. Session summary
 
 ```markdown
@@ -156,13 +158,58 @@ Example scenarios:
 
 ### 8. Update all databases
 
-Call `db-updater`:
+Use the `db-updater` skill:
+
 - `command_used: "/speaking"`, `skills_practiced: ["speaking"]`
 - `skill_scores.speaking: {exercises: N, correct: count_of_clear_answers, time_minutes}`
 - `errors[]` — only communication-blocking ones (don't flood mistakes-db with minor speaking slips)
 - `focus_next_session[]` — one topic + one pattern
 
 Save exchange to `/results/speaking-session-{NNN}.md`.
+
+## Examples
+
+### Example 1 — personal intro (Dutch A2)
+
+> ## Question 1: Introductions
+>
+> Vertel me over jezelf. Waar kom je vandaan?
+> (Tell me about yourself. Where are you from?)
+
+Learner: "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
+
+> ✅ Clear and natural!
+>
+> **What you said:** "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
+>
+> **Communication:** Clear ✅
+>
+> **Grammar notes:**
+> - 🟢 "van Iran" → **"uit Iran"** (prepositions — origin uses `uit`, not `van`). Small slip; message still crystal clear.
+>
+> **Natural alternative:**
+> "Ik kom uit Iran, maar ik woon al een paar jaar in Nederland."
+>
+> **Score: 9/10**
+> - Communication: 5/5
+> - Grammar: 2/3
+> - Vocabulary: 2/2
+>
+> Great start — you packed two ideas into one sentence, which is exactly what fluency looks like.
+
+### Example 2 — role-play opener (café scenario)
+
+> ## 🎭 Role-Play
+>
+> **Scenario:** You're at a café in Amsterdam. You want coffee and a vegetarian option for lunch.
+> **Your role:** Customer
+> **I'll be:** The server
+>
+> ---
+>
+> *"Goedemiddag! Wat wilt u drinken?"*
+>
+> **Your turn:**
 
 ## Critical Rules
 
@@ -171,10 +218,12 @@ Save exchange to `/results/speaking-session-{NNN}.md`.
 - **Stay in the target language** for questions and transitions. Drop to native only for explanations.
 - **Praise natural expression.** If the learner uses "Nou..." or "Eh..." correctly, call it out — those are fluency markers.
 - **Don't over-correct.** A speaking session with 20 red marks kills confidence.
+- **Never auto-invoke.** Gated; must fire only on explicit `/speaking`.
 
-## Useful Conversational Phrases (target language hints)
+## Language Reference
 
-### Dutch A2
+### Dutch A2 conversational fillers
+
 - "Nou..." (well / so)
 - "Eh..." (uh / um)
 - "Eigenlijk..." (actually)

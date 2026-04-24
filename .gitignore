@@ -27,6 +27,10 @@ myfile.txt
 .idea/
 *.sublime-*
 
+# Python bytecode
+__pycache__/
+*.pyc
+
 # Logs
 *.log
 npm-debug.log*

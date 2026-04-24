@@ -7,9 +7,17 @@ disable-model-invocation: true
 
 # Reading Comprehension Session
 
-Present one text, ask 4-6 comprehension questions, extract vocabulary.
+## Overview
 
-## Protocol
+Present one text (100-500 words depending on level), ask 4-6 comprehension questions, extract vocabulary. Builds passive-to-active bridge: learners decode target-language writing, then answer questions that force recall.
+
+## When to Use
+
+Trigger this skill only when the learner types `/reading`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+
+Skip this skill below A1 mastery 3 — shorter flashcard drills (`/vocab`) are more appropriate for very early learners.
+
+## Instructions
 
 ### 1. Load context
 
@@ -43,17 +51,10 @@ Today we're practicing **reading comprehension**. I'll show you a short {target_
 
 ### 3. Pick text type + length
 
-A2 types (100-200 words):
-- Personal email
-- Short news article
-- Advertisement
-- Instructions
-- Simple story
-- Blog post
-- Social media post
-- Info leaflet
+A2 types (100-200 words): personal email, short news, advertisement, instructions, simple story, blog post, social media post, info leaflet.
 
 B1 (200-350 words): opinion pieces, longer narratives, structured guides.
+
 B2+ (350-500): editorials, technical explanations, interviews.
 
 Match the topic to `learner-profile.focus_areas` when possible.
@@ -82,7 +83,7 @@ Rotate across these types:
 
 **Main idea:**
 ```markdown
-## {Q target language "Question"} 1: Hoofdidee (main idea)
+## Vraag 1: Hoofdidee (main idea)
 
 {question in target language}
 
@@ -193,7 +194,8 @@ If yes, stage each word for `new_vocabulary[]` in the end-of-session DB update.
 
 ### 9. Update all databases
 
-Call `db-updater`:
+Use the `db-updater` skill:
+
 - `command_used: "/reading"`, `skills_practiced: ["reading"]`
 - `skill_scores.reading: {exercises: N, correct: count_right, time_minutes}`
 - `errors[]` — per question-type weakness (category `comprehension`, `vocabulary`, `inference`)
@@ -202,6 +204,51 @@ Call `db-updater`:
 
 Save to `/results/reading-session-{NNN}.md` — include the full text + Q&A for later analysis.
 
+## Examples
+
+### Example 1 — personal email text (Dutch A2)
+
+> ## 📄 Reading Text 1
+>
+> **Topic:** Making weekend plans
+> **Type:** Personal email
+> **Length:** ~75 words
+>
+> ---
+>
+> Beste Mohammad,
+>
+> Bedankt voor je email! Leuk dat je naar Amsterdam komt volgende maand. Ik heb tijd op zaterdag 15 maart. Zullen we om 14:00 uur afspreken bij het Centraal Station? We kunnen naar een café gaan en daarna door de stad wandelen.
+>
+> Het weer is meestal koud in maart, dus neem een warme jas mee! Ik verheug me erop om je te zien.
+>
+> Groetjes,
+> Lisa
+>
+> ---
+>
+> Take your time. When you're done, type **"ready"**.
+
+### Example 2 — main-idea question on the above
+
+> ## Vraag 1: Hoofdidee
+>
+> Waar gaat deze email over?
+>
+> a) Lisa is op vakantie in Iran.
+> b) Lisa en Mohammad maken plannen voor een ontmoeting.
+> c) Lisa vraagt naar het weer.
+
+Learner: "b"
+
+> ✅ Correct!
+>
+> **Answer:** b) Lisa en Mohammad maken plannen voor een ontmoeting.
+>
+> **Explanation:** The email's core is the meetup plan — date, time, place, and activity. The weather is a secondary detail.
+>
+> **Score: 10/10**
+
 ## Critical Rules
 
 - **Wait for "ready"** before asking the first question. Rushing the reading step defeats the purpose.
@@ -209,20 +256,9 @@ Save to `/results/reading-session-{NNN}.md` — include the full text + Q&A for 
 - **Ask questions in the target language** (at least from A2 up). Reading-comprehension checks should happen in the same language as the text.
 - **Quote the text** in explanations so the learner can trace the answer back to the source.
 - **Vocabulary opt-in.** Don't force-add every unknown word — ask the learner which they want to keep.
+- **Never auto-invoke.** Gated; must fire only on explicit `/reading`.
 
-## Example Texts (Dutch A2)
-
-### Personal email
-```
-Beste Mohammad,
-
-Bedankt voor je email! Leuk dat je naar Amsterdam komt volgende maand. Ik heb tijd op zaterdag 15 maart. Zullen we om 14:00 uur afspreken bij het Centraal Station? We kunnen naar een café gaan en daarna door de stad wandelen.
-
-Het weer is meestal koud in maart, dus neem een warme jas mee! Ik verheug me erop om je te zien.
-
-Groetjes,
-Lisa
-```
+## Sample Text Bank (Dutch A2)
 
 ### Advertisement
 ```

@@ -21,36 +21,83 @@ https://github.com/user-attachments/assets/66d68aad-210a-452d-b405-b58c13f42f53
 - Basic understanding of command line
 - A desire to learn a new language! 🌟
 
-### Installation (2 minutes)
+### Installation
 
-1. **Download or Clone the repository:**
-You can either download the ZIP file and extract it, or clone it using git:
+Two supported install paths. Both end at the same `/setup` prompt and share the same skills, hooks, and databases.
+
+| Path | Best for | Data location |
+|------|----------|---------------|
+| **Claude Code plugin** (recommended) | Everyday use — runs from any directory | `~/.claude/fluent-data/` |
+| **Git clone** | Customizing skills, contributing, or per-project learning state | `./data/` inside the repo |
+
+---
+
+#### 📦 Install as a Claude Code plugin (recommended)
+
+Runs anywhere you launch Claude Code. Learner data is global under `~/.claude/fluent-data/` by default, so you can practice from any project or directory.
+
+1. **Add the Fluent marketplace to Claude Code:**
+   ```
+   /plugin marketplace add m98/fluent
+   ```
+
+2. **Install the Fluent plugin:**
+   ```
+   /plugin install fluent@fluent-marketplace
+   ```
+
+3. **Restart Claude Code**, then run the onboarding:
+   ```
+   /setup
+   ```
+
+4. **Start learning:**
+   ```
+   /learn
+   ```
+
+To update later: `/plugin update fluent@fluent-marketplace`. To uninstall: `/plugin uninstall fluent@fluent-marketplace`.
+
+---
+
+#### 📁 Install by cloning the repository
+
+Best if you want to customize skills, contribute upstream, or keep per-project learning state. Learner data lives in `./data/` inside the cloned repo — cd into the repo to work with a given learner.
+
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/m98/fluent.git
    cd fluent
    ```
 
-2. **Start Claude Code:**
+2. **Start Claude Code from the repo root:**
    ```bash
    claude
    ```
 
-3. **Run the setup command:**
+3. **Run the onboarding:**
    ```
    /setup
    ```
 
-4. **Answer a few questions:**
-   - What's your name?
-   - What language do you want to learn?
-   - What's your current level?
-   - What's your target level?
-   - How much time can you dedicate daily?
-
-5. **Start learning:**
+4. **Start learning:**
    ```
    /learn
    ```
+
+To update later: `git pull` inside the repo.
+
+---
+
+#### 📂 Where your data lives
+
+Fluent stores your profile, progress, mistakes, and spaced-repetition state as JSON. Resolution precedence on every run:
+
+1. `$FLUENT_DATA_DIR` if the environment variable is set.
+2. `./data/` if `./data/learner-profile.json` already exists in the current directory (clone mode).
+3. `~/.claude/fluent-data/` otherwise (plugin-install default).
+
+Set `FLUENT_DATA_DIR` in your shell (e.g. `export FLUENT_DATA_DIR=~/.fluent/dutch`) to run multiple learners, one per target language, on the same machine.
 
 **That's it!** Your AI tutor is ready and knows everything about your goals.
 

@@ -7,9 +7,17 @@ disable-model-invocation: true
 
 # Language Learning Setup
 
-One-time onboarding that seeds all 6 databases in `data/`. After setup, every other skill reads from those files — this is the bootstrap.
+## Overview
 
-## Protocol
+One-time onboarding that seeds all 6 databases in `data/`. After setup, every other skill reads from those files — this is the bootstrap. Also handles profile updates and progress resets for returning users.
+
+## When to Use
+
+Trigger this skill only when the learner types `/setup`. The skill is gated with `disable-model-invocation: true` — re-running can reset a learner's progress, so it must never auto-fire from an ambiguous prompt.
+
+Skip this skill if a profile already exists and the learner did not ask to change anything; route them to `/learn` or `/progress` instead.
+
+## Instructions
 
 ### 1. Check for existing profile
 
@@ -17,7 +25,7 @@ One-time onboarding that seeds all 6 databases in `data/`. After setup, every ot
 test -f data/learner-profile.json && echo "exists" || echo "new"
 ```
 
-If it exists, jump to **Profile Updates** at the bottom. Otherwise continue.
+If it exists, jump to **Profile updates** below. Otherwise continue.
 
 ### 2. Welcome
 
@@ -75,6 +83,7 @@ months = hours_needed / (daily_minutes / 60) / 30
 ```
 
 Adjust:
+
 - `-10%` time if learner's native language is typologically close to the target (e.g. Dutch ↔ English, Spanish ↔ Italian).
 - `-10%` per additional language already known (cap at 30% total).
 
@@ -136,7 +145,7 @@ Start from the templates in `data-examples/`. Create in `data/`:
 - `spaced-repetition.json` — empty queues, `daily_limits.review_items_per_day: 20`.
 - `session-log.json` — empty `sessions` array, `total_sessions: 0`.
 
-Use Write tool for each. Don't call `update-db.py` — that script is for session updates, not bootstrapping.
+Use Write tool for each. Do not call `update-db.py` — that script is for session updates, not bootstrapping.
 
 ### 6. Optional first lesson
 
@@ -169,13 +178,31 @@ What would you like to do?
 
 - **1** — ask which field, update only that field, preserve the rest.
 - **2** — render the plan section from current data. Read-only.
-- **3** — confirm twice. This deletes every file in `data/`. Call `.claude/hooks/session-end.py` first to snapshot to `.backups/` (the hook runs on session end, not arbitrary call, so manually: `mkdir -p .backups/pre-reset-$(date +%Y%m%d-%H%M%S) && cp data/*.json .backups/pre-reset-$(date +%Y%m%d-%H%M%S)/`). Then restart setup from Step 2.
+- **3** — confirm twice. This deletes every file in `data/`. Back up first: `mkdir -p .backups/pre-reset-$(date +%Y%m%d-%H%M%S) && cp data/*.json .backups/pre-reset-$(date +%Y%m%d-%H%M%S)/`. Then restart setup from Step 2.
 - **4** — exit cleanly.
+
+## Examples
+
+### Example 1 — first-time setup flow
+
+Learner runs `/setup`. After collecting all 11 answers, compute months, generate plan, write 6 JSON files, offer first lesson.
+
+### Example 2 — returning-user profile reset
+
+Learner: "reset my progress, I want to start over"
+
+> You're about to delete:
+> - 42 sessions
+> - 6-day streak
+> - 287 vocabulary items
+> - 12 mastered patterns
+>
+> This is irreversible. Type `RESET` (all caps) to confirm, or anything else to cancel.
 
 ## Critical Rules
 
 - **Never auto-invoke.** Re-running this can reset a learner's progress. Must be an explicit `/setup`.
 - **Confirm twice before reset.** "This will erase X days of progress, Y sessions, and Z mastered words. Proceed? (yes/no)".
 - **Always seed all 6 files** — every other skill assumes they exist.
-- **Back up before reset.** Hooks may not fire here; back up manually.
+- **Back up before reset.** Hooks may not fire here; back up manually to `.backups/pre-reset-<timestamp>/`.
 - **Don't invent data.** Start every file empty — progress, mistakes, mastery all start at zero. The system builds up from real sessions.
