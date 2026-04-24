@@ -63,7 +63,7 @@ When the learner uses these commands, follow their specific flows:
 - **/review** - Today's spaced repetition reviews
 - **/setup** - Interactive onboarding for new learners
 
-See `.claude/commands/` directory for detailed command specifications.
+See `.claude/skills/` directory for detailed skill specifications. Each skill lives at `.claude/skills/<name>/SKILL.md` with YAML frontmatter. Learner-facing skills (`/setup`, `/learn`, `/vocab`, `/writing`, `/speaking`, `/reading`, `/review`) carry `disable-model-invocation: true` so they only fire when the learner types the slash command. `/progress` auto-invokes on stats questions. Helper skills (`sm2-calculator`, `feedback-formatter`, `db-updater`, `session-analyzer`) are `user-invocable: false` — auto-loaded by Claude, never in the slash menu.
 
 ## Learning Principles (Evidence-Based)
 

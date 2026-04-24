@@ -232,7 +232,7 @@ The AI follows these guides:
 
 ### Interface Layer
 
-- **8 Custom Commands** (`.claude/commands/`) - Interactive slash commands
+- **Skills** (`.claude/skills/`) - Interactive slash commands + helper skills. Learner-facing skills (`/setup`, `/learn`, `/vocab`, `/writing`, `/speaking`, `/reading`, `/review`, `/progress`) are invoked by typing their name. Helper skills (SM-2 calculator, feedback formatter, DB updater, session analyzer) auto-load when Claude needs them.
 - **Automatic Hooks** (`.claude/settings.json`) - Auto-backup on every change
 - **Session Results** (`/results/`) - Detailed practice logs
 

@@ -60,26 +60,35 @@ You are an **interactive language tutor** that helps learners master any languag
 4. progress-db.json        → HOW are they progressing?
 ```
 
-### 4. Custom Commands (`.claude/commands/`)
+### 4. Skills (`.claude/skills/`)
 
-**These are user-triggered slash commands that define different practice modes:**
+**Learner-facing skills** (`disable-model-invocation: true` — only fire on slash command):
 
 | Command | File | Purpose | Your Job |
 |---------|------|---------|----------|
-| `/setup` | `setup.md` | Interactive onboarding | Collect learner info, create profile |
-| `/learn` | `learn.md` | Main adaptive session | Mixed practice, adapt to performance |
-| `/review` | `review.md` | Spaced repetition | Review items due today (SM-2) |
-| `/vocab` | `vocab.md` | Vocabulary drills | Flashcard-style practice |
-| `/writing` | `writing.md` | Writing practice | Emails, letters, essays |
-| `/speaking` | `speaking.md` | Conversation practice | Typed dialogue, pronunciation |
-| `/reading` | `reading.md` | Reading comprehension | Present text, ask questions |
-| `/progress` | `progress.md` | Statistics dashboard | Show charts, achievements |
+| `/setup` | `setup/SKILL.md` | Interactive onboarding | Collect learner info, create profile |
+| `/learn` | `learn/SKILL.md` | Main adaptive session | Mixed practice, adapt to performance |
+| `/review` | `review/SKILL.md` | Spaced repetition | Review items due today (SM-2) |
+| `/vocab` | `vocab/SKILL.md` | Vocabulary drills | Flashcard-style practice |
+| `/writing` | `writing/SKILL.md` | Writing practice | Emails, letters, essays |
+| `/speaking` | `speaking/SKILL.md` | Conversation practice | Typed dialogue |
+| `/reading` | `reading/SKILL.md` | Reading comprehension | Present text, ask questions |
+| `/progress` | `progress/SKILL.md` | Statistics dashboard | Auto-invokable — no gate |
 
-**How commands work:**
-- User types `/learn` (for example)
-- You read `learn.md` for step-by-step instructions
+**Helper skills** (`user-invocable: false` — auto-loaded by Claude, not in `/` menu):
+
+| Skill | Purpose |
+|-------|---------|
+| `sm2-calculator` | SM-2 algorithm reference |
+| `feedback-formatter` | Canonical feedback template + severity tagging |
+| `db-updater` | How to call `update-db.py` with a session report |
+| `session-analyzer` | How to parse `/results/*.md` to plan next session |
+
+**How skills work:**
+- User types `/learn` → Claude loads `.claude/skills/learn/SKILL.md`
 - Follow the protocol exactly
-- Update all databases after session
+- Helper skills referenced inline auto-load as needed
+- Update all databases at session end via the `db-updater` skill
 
 ### 5. Session Results (`/results`)
 
@@ -224,7 +233,7 @@ You MUST implement these evidence-based methods:
 1. User runs: /learn
 
 2. You read:
-   - .claude/commands/learn.md (instructions)
+   - .claude/skills/learn/SKILL.md (instructions)
    - data/learner-profile.json (who)
    - data/spaced-repetition.json (what's due)
    - data/mistakes-db.json (weak areas)
