@@ -1,7 +1,7 @@
 ---
 name: setup
 description: One-time interactive onboarding that creates the learner's personalized language-learning profile — name, target language, native language, current/target CEFR level, timeline, daily minutes, and learning goals. Triggered only when the learner types /setup. Also handles profile updates and resets for returning users. Must never auto-invoke because re-running can reset progress.
-allowed-tools: Read, Write, Bash
+allowed-tools: Read, Write, Bash, AskUserQuestion
 disable-model-invocation: true
 ---
 
@@ -9,7 +9,29 @@ disable-model-invocation: true
 
 ## Overview
 
-One-time onboarding that seeds all 6 databases in `data/`. After setup, every other skill reads from those files — this is the bootstrap. Also handles profile updates and progress resets for returning users.
+One-time onboarding that seeds all 6 databases in the Fluent data directory. After setup, every other skill reads from those files — this is the bootstrap. Also handles profile updates and progress resets for returning users.
+
+The data directory is resolved at runtime (not hardcoded to `./data/`):
+
+1. `$FLUENT_DATA_DIR` if set
+2. `$CLAUDE_PROJECT_DIR/data/` if that path contains `learner-profile.json` (clone mode)
+3. `./data/` if `./data/learner-profile.json` exists (clone mode, cwd inside repo)
+4. `~/.claude/fluent-data/` otherwise (plugin-install default)
+
+Always resolve it via the helper rather than writing literal `data/` paths:
+
+```bash
+FLUENT_DATA="$(python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/ensure_data_dir.py")"
+```
+
+or from Python:
+
+```python
+import sys
+sys.path.insert(0, f"{PLUGIN_ROOT}/.claude/hooks")
+from fluent_paths import ensure_data_dir
+DATA = ensure_data_dir()
+```
 
 ## When to Use
 
@@ -21,8 +43,15 @@ Skip this skill if a profile already exists and the learner did not ask to chang
 
 ### 1. Check for existing profile
 
+Resolve the data directory first, then probe for `learner-profile.json`:
+
 ```bash
-test -f data/learner-profile.json && echo "exists" || echo "new"
+DATA_DIR="$(python3 -c "
+import sys; sys.path.insert(0, '${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks')
+from fluent_paths import data_dir
+print(data_dir())
+")"
+test -f "$DATA_DIR/learner-profile.json" && echo "exists" || echo "new"
 ```
 
 If it exists, jump to **Profile updates** below. Otherwise continue.
@@ -136,7 +165,7 @@ Present:
 
 ### 5. Write databases
 
-Start from the templates in `data-examples/`. Create in `data/`:
+Start from the templates in `data-examples/`. Resolve the target directory via `fluent_paths.ensure_data_dir()` (it creates the directory if missing), then create these 6 files inside it:
 
 - `learner-profile.json` — fill all fields from the interview.
 - `progress-db.json` — empty stats.
@@ -145,7 +174,7 @@ Start from the templates in `data-examples/`. Create in `data/`:
 - `spaced-repetition.json` — empty queues, `daily_limits.review_items_per_day: 20`.
 - `session-log.json` — empty `sessions` array, `total_sessions: 0`.
 
-Use Write tool for each. Do not call `update-db.py` — that script is for session updates, not bootstrapping.
+Use the Write tool for each. Do not call `update-db.py` — that script is for session updates, not bootstrapping.
 
 ### 6. Optional first lesson
 
@@ -178,7 +207,20 @@ What would you like to do?
 
 - **1** — ask which field, update only that field, preserve the rest.
 - **2** — render the plan section from current data. Read-only.
-- **3** — confirm twice. This deletes every file in `data/`. Back up first: `mkdir -p .backups/pre-reset-$(date +%Y%m%d-%H%M%S) && cp data/*.json .backups/pre-reset-$(date +%Y%m%d-%H%M%S)/`. Then restart setup from Step 2.
+- **3** — confirm twice. This deletes every file in the resolved data directory. Back up first:
+
+  ```bash
+  DATA_DIR="$(python3 -c "
+  import sys; sys.path.insert(0, '${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks')
+  from fluent_paths import data_dir
+  print(data_dir())
+  ")"
+  TS="$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$DATA_DIR/.backups/pre-reset-$TS"
+  cp "$DATA_DIR"/*.json "$DATA_DIR/.backups/pre-reset-$TS/"
+  ```
+
+  Then restart setup from Step 2.
 - **4** — exit cleanly.
 
 ## Examples

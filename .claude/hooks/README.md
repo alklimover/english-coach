@@ -110,7 +110,16 @@ Hooks ensure your learning data is:
 
 ### Hook Configuration
 
-Hooks are configured in `.claude/settings.json`:
+Fluent supports **two hook registration paths** so the same scripts work whether you cloned the repo or installed it as a plugin:
+
+| Install path | Where hooks are registered | Env var used in commands |
+|--------------|---------------------------|--------------------------|
+| Git clone | `.claude/settings.json` | `$CLAUDE_PROJECT_DIR` |
+| Plugin install | `.claude/hooks/hooks.json` (referenced from `plugin.json`) | `$CLAUDE_PLUGIN_ROOT` (with `$CLAUDE_PROJECT_DIR` fallback) |
+
+Both paths point at the same Python scripts under `.claude/hooks/`. The scripts themselves resolve the runtime data directory via `fluent_paths.py` — `$FLUENT_DATA_DIR` → `./data/` → `~/.claude/fluent-data/`.
+
+Clone-mode `.claude/settings.json` example:
 
 ```json
 {
@@ -122,6 +131,26 @@ Hooks are configured in `.claude/settings.json`:
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/validate-data.py"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Plugin-mode `.claude/hooks/hooks.json` example (identical structure, different env var):
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR}}/.claude/hooks/validate-data.py"
           }
         ]
       }

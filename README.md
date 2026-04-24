@@ -18,8 +18,15 @@ https://github.com/user-attachments/assets/66d68aad-210a-452d-b405-b58c13f42f53
 
 - [Claude Code](https://code.claude.com) installed
 - A Claude Code subscription
-- Basic understanding of command line
+- **Python 3.8+** in your `PATH` — used by the automation hooks and DB scripts. Check: `python3 --version`.
+  - macOS: pre-installed, or `brew install python3`.
+  - Linux: `sudo apt install python3` (Debian/Ubuntu) or distro equivalent.
+  - Windows: install via [python.org](https://www.python.org/downloads/) or use WSL.
+- **Bash** — needed by the PreCompact safety-backup hook. Built-in on macOS/Linux. On Windows, use WSL or Git Bash.
+- Basic understanding of command line.
 - A desire to learn a new language! 🌟
+
+> **No third-party Python packages required.** Fluent uses only the Python standard library — nothing to `pip install`.
 
 ### Installation
 
@@ -36,27 +43,66 @@ Two supported install paths. Both end at the same `/setup` prompt and share the 
 
 Runs anywhere you launch Claude Code. Learner data is global under `~/.claude/fluent-data/` by default, so you can practice from any project or directory.
 
-1. **Add the Fluent marketplace to Claude Code:**
-   ```
-   /plugin marketplace add m98/fluent
-   ```
+Two interchangeable paths — use whichever fits your workflow.
 
-2. **Install the Fluent plugin:**
-   ```
-   /plugin install fluent@fluent-marketplace
-   ```
+**Path 1 — Terminal (`claude` CLI):**
 
-3. **Restart Claude Code**, then run the onboarding:
-   ```
-   /setup
-   ```
+```bash
+# 1. Add the Fluent marketplace (one-time; uses an interactive session)
+claude
+# Inside Claude Code:
+/plugin marketplace add m98/fluent
+# Then exit Claude Code (Ctrl+D or /exit)
 
-4. **Start learning:**
-   ```
-   /learn
-   ```
+# 2. Install the plugin from the shell — persists to your user config
+claude plugin install fluent@fluent-marketplace
 
-To update later: `/plugin update fluent@fluent-marketplace`. To uninstall: `/plugin uninstall fluent@fluent-marketplace`.
+# 3. Verify the install (should list "fluent" as enabled)
+claude plugin list
+claude plugin validate fluent@fluent-marketplace
+
+# 4. Launch Claude Code and start learning
+claude
+/setup
+/learn
+```
+
+**Path 2 — Inside Claude Code (slash commands only):**
+
+```
+claude
+```
+
+Then in the session:
+
+```
+/plugin marketplace add m98/fluent
+/plugin install fluent@fluent-marketplace
+/plugin list                       # verify
+```
+
+Restart Claude Code, then run `/setup` to onboard and `/learn` to begin.
+
+**Maintenance:**
+
+- Update: `claude plugin update fluent@fluent-marketplace` (or `/plugin update fluent@fluent-marketplace` inside a session).
+- Disable without uninstalling: `claude plugin disable fluent@fluent-marketplace`.
+- Uninstall: `claude plugin uninstall fluent@fluent-marketplace`.
+
+**Verify it's working:**
+
+After installing and restarting, open Claude Code and confirm:
+
+```
+/                    # should show /setup, /learn, /vocab, /writing, /speaking,
+                     # /reading, /review, /progress, plus helper skills
+```
+
+Or from the shell:
+
+```bash
+claude plugin list | grep fluent    # expect: fluent@fluent-marketplace  enabled
+```
 
 ---
 
@@ -91,13 +137,24 @@ To update later: `git pull` inside the repo.
 
 #### 📂 Where your data lives
 
-Fluent stores your profile, progress, mistakes, and spaced-repetition state as JSON. Resolution precedence on every run:
+Fluent stores your profile, progress, mistakes, and spaced-repetition state as JSON. Resolution precedence on every run (first match wins):
 
 1. `$FLUENT_DATA_DIR` if the environment variable is set.
-2. `./data/` if `./data/learner-profile.json` already exists in the current directory (clone mode).
-3. `~/.claude/fluent-data/` otherwise (plugin-install default).
+2. `$CLAUDE_PROJECT_DIR/data/` if that path contains `learner-profile.json` (clone mode, running from outside the repo root).
+3. `./data/` if `./data/learner-profile.json` exists in the current working directory (clone mode, running inside the repo).
+4. `~/.claude/fluent-data/` otherwise (plugin-install default).
 
 Set `FLUENT_DATA_DIR` in your shell (e.g. `export FLUENT_DATA_DIR=~/.fluent/dutch`) to run multiple learners, one per target language, on the same machine.
+
+**Verify your resolved data dir** at any time:
+
+```bash
+python3 -c "
+import sys; sys.path.insert(0, '.claude/hooks')
+from fluent_paths import data_dir
+print('Fluent data directory:', data_dir())
+"
+```
 
 **That's it!** Your AI tutor is ready and knows everything about your goals.
 
@@ -201,9 +258,20 @@ This system implements proven learning science:
 
 ---
 
-## 🎮 Available Commands
+## 🎮 Available Commands & Skills
 
-### Core Commands
+Fluent is built as **Claude Code skills** — 12 of them. Skills work two ways:
+
+1. **Type the slash command** (`/learn`, `/vocab`, etc.) — you explicitly start a session. Learner-facing skills are gated so they only run this way. No accidental 20-minute session triggered by a chat message.
+2. **Ask naturally** — read-only skills like `/progress` auto-trigger when you ask "how am I doing?" or "what's my streak?". Helper skills (SM-2 math, feedback formatter, DB updater, session analyzer) auto-load whenever Claude needs them during a session.
+
+All 12 skills appear in your `/` menu so you can always invoke any of them manually.
+
+### Learner-facing commands
+
+These are the commands you'll use daily. Each is backed by a dedicated skill under `.claude/skills/`.
+
+#### Core Commands
 
 | Command | What It Does | When & Why to Use It |
 |---------|--------------|----------------------|
@@ -211,7 +279,7 @@ This system implements proven learning science:
 | **`/learn`** | **Adaptive mixed practice** - Combines different exercise types (vocabulary, grammar, sentences) based on your weak areas. Adjusts difficulty in real-time based on your performance. | **Daily core practice** - Your main command for general improvement. The AI decides what you need to practice most. Best after `/review`. |
 | **`/review`** | **Spaced repetition session** - Shows you items that are due for review today based on the SM-2 algorithm. Focuses on things you learned before that need reinforcement. | **Start every day here!** - Review before learning new content. This is scientifically proven to be the most effective way to retain what you've learned. |
 
-### Skill-Specific Commands
+#### Skill-Specific Commands
 
 | Command | What It Does | When & Why to Use It |
 |---------|--------------|----------------------|
@@ -220,11 +288,22 @@ This system implements proven learning science:
 | **`/speaking`** | **Conversation practice** - Role-play scenarios through typed dialogue. Practice natural conversations, asking for directions, ordering food, etc. | **2-3x per week** - Builds confidence for real conversations. Typed practice helps you think through responses without pressure. |
 | **`/reading`** | **Reading comprehension** - Read short texts (stories, articles, dialogues) then answer comprehension questions. Expands vocabulary in context. | **2-3x per week** - Improves overall understanding. Best for intermediate+ learners. Reading is one of the fastest ways to absorb grammar patterns. |
 
-### Progress Command
+#### Progress Command
 
 | Command | What It Does | When & Why to Use It |
 |---------|--------------|----------------------|
-| **`/progress`** | **Statistics dashboard** - Shows your accuracy trends, streak days, mastery levels, achievements unlocked, and weak areas. Visual progress charts. | **Weekly check-in** - See how far you've come! Motivation boost when you see concrete improvement. Helps identify what to focus on next. |
+| **`/progress`** | **Statistics dashboard** - Shows your accuracy trends, streak days, mastery levels, achievements unlocked, and weak areas. Visual progress charts. | **Weekly check-in** - Read-only and safe to auto-invoke. Ask "how am I doing?" and Claude will open the dashboard automatically. |
+
+### Helper skills (behind the scenes)
+
+These skills don't change what the learner-facing commands do — they let Claude apply the same algorithms, feedback format, and database logic consistently across every session. You can still invoke them via `/` if curious.
+
+| Skill | What It Does | When It Runs |
+|-------|--------------|--------------|
+| **`/sm2-calculator`** | SM-2 spaced-repetition algorithm reference: quality scale, interval formula, easiness-factor update, mastery-level transitions. | Auto-loaded whenever a review item is scored. |
+| **`/feedback-formatter`** | Canonical per-answer feedback template — severity tagging (🔴 critical / 🟡 moderate / 🟢 minor), category labels, tone rules. | Auto-loaded every time Claude grades an answer. |
+| **`/db-updater`** | How to call `update-db.py` with a single JSON payload that atomically updates all 6 databases at session end. | Auto-loaded when a session ends. |
+| **`/session-analyzer`** | Parses `/results/{skill}-session-{ID}.md` files to extract error patterns, strengths, and focus areas for the next session. | Auto-loaded when planning the next session. |
 
 ### 📅 Recommended Daily Routine
 
@@ -276,12 +355,14 @@ The AI follows these guides:
 - **`LEARNING_SYSTEM.md`** - Complete methodology (how to teach)
 - **`CLAUDE.md`** - AI tutor's role and personality
 - **`PRACTICE.md`** - Pattern analysis and tracking
+- **`.claude/references/`** - Shared templates (SM-2 worked examples, feedback template, DB payload schema, session-file format) that every skill references
 
 ### Interface Layer
 
-- **Skills** (`.claude/skills/`) - Interactive slash commands + helper skills. Learner-facing skills (`/setup`, `/learn`, `/vocab`, `/writing`, `/speaking`, `/reading`, `/review`, `/progress`) are invoked by typing their name. Helper skills (SM-2 calculator, feedback formatter, DB updater, session analyzer) auto-load when Claude needs them.
-- **Automatic Hooks** (`.claude/settings.json`) - Auto-backup on every change
-- **Session Results** (`/results/`) - Detailed practice logs
+- **Skills** (`.claude/skills/`) — 12 skills total. 8 learner-facing (`/setup`, `/learn`, `/vocab`, `/writing`, `/speaking`, `/reading`, `/review`, `/progress`) run when you invoke them. 4 helper skills (`/sm2-calculator`, `/feedback-formatter`, `/db-updater`, `/session-analyzer`) auto-load whenever Claude needs them during a session — and are also directly `/`-invokable if you want to read the reference.
+- **Plugin manifests** (`.claude-plugin/`) — `plugin.json` + `marketplace.json` make Fluent installable via `/plugin marketplace add m98/fluent`.
+- **Automatic Hooks** (`.claude/hooks/`) — SessionStart welcome, SessionEnd backups, PostToolUse JSON validation + backups, PreCompact safety backup. Both `hooks.json` (plugin mode) and `.claude/settings.json` (clone mode) wire them up.
+- **Session Results** (`/results/`) — Detailed practice logs per session, parsed by `session-analyzer` to plan future sessions.
 
 ---
 
@@ -330,10 +411,11 @@ The system automatically adjusts:
 
 ### Technology Stack
 
-- **Platform:** Claude Code (Anthropic)
-- **AI Model:** Claude (Sonnet 4.5)
+- **Platform:** Claude Code (Anthropic), installable as a plugin or by clone
+- **AI Model:** Claude (any Claude Code-supported model)
 - **Data Format:** JSON (human-readable)
-- **Commands:** Markdown with YAML frontmatter
+- **Skills:** Markdown `SKILL.md` files with YAML frontmatter (12 total — 8 learner-facing + 4 helper)
+- **Hooks:** Python + Bash, triggered on SessionStart / SessionEnd / PostToolUse / PreCompact
 - **Algorithm:** SM-2 (SuperMemo 2)
 - **Version Control:** Git
 
@@ -438,10 +520,10 @@ It helps others discover this project and motivates us to keep improving it!
 
 ## 📈 Project Stats
 
-- **Documentation:** ~15,000 words
-- **Command Code:** ~1,500 lines
-- **Commands:** 8 interactive slash commands
+- **Skills:** 12 (8 learner-facing + 4 helper)
+- **Hooks:** 5 automated (SessionStart, SessionEnd, PostToolUse, PreCompact, DB helpers)
 - **Databases:** 6 JSON tracking files
+- **Install paths:** 2 (Claude Code plugin + git clone — both supported)
 - **Languages Supported:** All (system is fully language-agnostic)
 - **Learning Methods:** 6 evidence-based principles
 - **Contributors:** [See contributors](https://github.com/m98/fluent/graphs/contributors)
@@ -454,9 +536,36 @@ It helps others discover this project and motivates us to keep improving it!
 
 ---
 
+## 🛠️ Troubleshooting
+
+**`python3: command not found` when hooks run.**
+Install Python 3.8+ and make sure `python3` is on your PATH. On macOS: `brew install python3`. On Debian/Ubuntu: `sudo apt install python3`. On Windows: install via [python.org](https://www.python.org/downloads/) or use WSL.
+
+**Hooks silently do nothing on Windows.**
+The PreCompact hook is a Bash script. Run Claude Code from WSL or Git Bash. The Python hooks (SessionStart, SessionEnd, PostToolUse) work on native Windows Python — only PreCompact is Bash-only.
+
+**Learner data is showing up in the wrong place.**
+Check the data-dir resolution order (see above). Set `FLUENT_DATA_DIR` explicitly in your shell to force a specific location.
+
+**JSON validation fails after a manual edit.**
+The PostToolUse hook exits with status 2 if it finds malformed JSON. The last 10 backups live at `<data_dir>/<filename>.json.backup-<timestamp>`. Restore with: `cp <data_dir>/learner-profile.json.backup-XXXXXX <data_dir>/learner-profile.json`.
+
+**Skills don't appear in the `/` menu after plugin install.**
+Restart Claude Code. If still missing, verify install:
+
+```bash
+claude plugin list                              # should show fluent@fluent-marketplace enabled
+claude plugin validate fluent@fluent-marketplace
+```
+
+Or from inside a session: `/plugin list`. If the plugin is disabled, enable it: `claude plugin enable fluent@fluent-marketplace`.
+
+---
+
 ## 🔗 Useful Links
 
 - [Claude Code Documentation](https://code.claude.com/docs)
+- [Claude Code Plugins](https://code.claude.com/docs/en/plugins)
 - [SM-2 Algorithm Explained](https://www.supermemo.com/en/archives1990-2015/english/ol/sm2)
 - [CEFR Levels](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions)
 - [Spaced Repetition Research](https://www.gwern.net/Spaced-repetition)

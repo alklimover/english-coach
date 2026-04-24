@@ -13,6 +13,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fluent_paths import data_dir  # noqa: E402
 
+MAX_BACKUPS_PER_FILE = 10
+
+
+def rotate_backups(file_path: str, keep: int = MAX_BACKUPS_PER_FILE) -> None:
+    """Keep only the most recent `keep` .backup-* files for a given data file."""
+    parent = Path(file_path).parent
+    stem = Path(file_path).name
+    backups = sorted(parent.glob(f"{stem}.backup-*"), reverse=True)
+    for old in backups[keep:]:
+        try:
+            old.unlink()
+        except OSError:
+            pass
+
 
 def main():
     try:
@@ -45,6 +59,7 @@ def main():
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         backup_path = f"{file_path}.backup-{timestamp}"
         shutil.copy2(file_path, backup_path)
+        rotate_backups(file_path)
 
         print(f"[Fluent] ✓ Data saved and validated: {file_path}")
         print(f"[Fluent] 💾 Backup created: {backup_path}")

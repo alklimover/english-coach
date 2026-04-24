@@ -25,12 +25,12 @@ Skip this skill if no vocabulary items are due and no new words are queued — o
 python3 .claude/hooks/read-db.py
 ```
 
-If the helper is unavailable, read:
+If the helper is unavailable, resolve `<data_dir>` via `fluent_paths.data_dir()` then read:
 
-- `data/spaced-repetition.json`
-- `data/mistakes-db.json`
-- `data/mastery-db.json`
-- `data/learner-profile.json` (for target_language, name, level)
+- `<data_dir>/spaced-repetition.json`
+- `<data_dir>/mistakes-db.json`
+- `<data_dir>/mastery-db.json`
+- `<data_dir>/learner-profile.json` (for target_language, name, level)
 
 If any are missing, direct the learner to `/setup` and stop.
 

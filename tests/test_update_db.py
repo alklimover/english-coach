@@ -216,8 +216,9 @@ class UpdateDbSmokeTest(unittest.TestCase):
         self.assertEqual(pat["examples"][-1]["incorrect"], "Hij spreek")
         self.assertEqual(pat["examples"][-1]["correct"], "Hij spreekt")
 
-        # Backup directory exists
-        backup = self.tmp / ".backups" / "pre-update-session-002"
+        # Backup directory exists (nested inside data/ to avoid collisions
+        # with other plugins when the global fallback ~/.claude/fluent-data is used).
+        backup = self.tmp / "data" / ".backups" / "pre-update-session-002"
         self.assertTrue(backup.exists(), "pre-update backup missing")
 
     def test_missing_required_field_exits_1(self):

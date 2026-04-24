@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fluent_paths import data_dir, backups_dir  # noqa: E402
+from fluent_paths import data_dir, ensure_backups_dir  # noqa: E402
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
     except json.JSONDecodeError:
         pass
 
-    backup_dir = backups_dir() / datetime.now().strftime("%Y%m%d")
+    backup_dir = ensure_backups_dir() / datetime.now().strftime("%Y%m%d")
     backup_dir.mkdir(parents=True, exist_ok=True)
 
     data = data_dir()

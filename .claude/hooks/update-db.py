@@ -22,10 +22,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fluent_paths import data_dir, backups_dir  # noqa: E402
+from fluent_paths import ensure_data_dir, ensure_backups_dir  # noqa: E402
 
-DATA_DIR = data_dir()
-BACKUP_DIR = backups_dir()
+DATA_DIR = ensure_data_dir()
+BACKUP_DIR = ensure_backups_dir()
 
 # --- Utility functions ---
 
@@ -330,11 +330,12 @@ def update_spaced_repetition(sr: dict, session: dict):
             else:
                 item["consecutive_incorrect"] = item.get("consecutive_incorrect", 0) + 1
                 item["consecutive_correct"] = 0
-            # Mastery: rough map from repetitions and quality
+            # Mastery: rough map from repetitions and quality (clamped 0..5)
+            current = item.get("mastery_level", 0)
             if item["repetitions"] >= 5 and item["consecutive_correct"] >= 3:
-                item["mastery_level"] = max(item.get("mastery_level", 0), 3)
-            elif item["repetitions"] >= 2 and item["consecutive_correct"] >= 1:
-                item["mastery_level"] = max(item.get("mastery_level", 0), item.get("mastery_level", 0) + 1 if quality >= 4 else item.get("mastery_level", 0))
+                item["mastery_level"] = min(5, max(current, 3))
+            elif item["repetitions"] >= 2 and item["consecutive_correct"] >= 1 and quality >= 4:
+                item["mastery_level"] = min(5, current + 1)
             # priority heuristic
             if item.get("consecutive_incorrect", 0) >= 2:
                 item["priority"] = "high"

@@ -33,14 +33,14 @@ python3 .claude/hooks/read-db.py
 
 This returns a single JSON with all 6 databases + computed fields (`due_reviews_count`, `next_session_id`, `streak_active`, `days_since_last_session`).
 
-If the helper is unavailable, fall back to reading each file directly:
+If the helper is unavailable, fall back to reading each file directly. Resolve the data directory via `fluent_paths.data_dir()` first — do NOT hardcode `data/` (plugin installs store data under `~/.claude/fluent-data/`):
 
-- `data/learner-profile.json`
-- `data/progress-db.json`
-- `data/mastery-db.json`
-- `data/mistakes-db.json`
-- `data/spaced-repetition.json`
-- `data/session-log.json`
+- `<data_dir>/learner-profile.json`
+- `<data_dir>/progress-db.json`
+- `<data_dir>/mastery-db.json`
+- `<data_dir>/mistakes-db.json`
+- `<data_dir>/spaced-repetition.json`
+- `<data_dir>/session-log.json`
 
 If any are missing, point the learner at `/setup` and stop.
 
