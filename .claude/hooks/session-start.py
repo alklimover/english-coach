@@ -24,7 +24,7 @@ def main():
 
     if not profile_path.exists():
         print("[Fluent] 🌍 Welcome to Fluent - The AI Language Learning Kit!")
-        print("[Fluent] 📝 Run /setup to create your personalized learning profile")
+        print("[Fluent] 📝 Run /fluent-setup to create your personalized learning profile")
         sys.exit(0)
 
     try:
@@ -60,7 +60,7 @@ def main():
                         due_count += 1
 
                 if due_count > 0:
-                    print(f"[Fluent] 📅 {due_count} items due for review today - Run /review!")
+                    print(f"[Fluent] 📅 {due_count} items due for review today - Run /fluent-review!")
 
             except Exception:
                 pass

@@ -27,8 +27,8 @@ One line. Registers the marketplace, installs the plugin. Works globally from an
 Restart Claude Code, then:
 
 ```
-/setup     # onboard: name, target language, level, goals
-/learn     # begin your first session
+/fluent-setup     # onboard: name, target language, level, goals
+/fluent-learn     # begin your first session
 ```
 
 That's it.
@@ -57,7 +57,7 @@ Prefer to hack on the skills or keep per-project state?
 git clone https://github.com/m98/fluent.git
 cd fluent
 claude          # launch from repo root
-/setup
+/fluent-setup
 ```
 
 Learner data lives in `./data/` inside the cloned repo instead of `~/.claude/fluent-data/`.
@@ -187,8 +187,8 @@ This system implements proven learning science:
 
 Fluent is built as **Claude Code skills** — 12 of them. Skills work two ways:
 
-1. **Type the slash command** (`/learn`, `/vocab`, etc.) — you explicitly start a session. Learner-facing skills are gated so they only run this way. No accidental 20-minute session triggered by a chat message.
-2. **Ask naturally** — read-only skills like `/progress` auto-trigger when you ask "how am I doing?" or "what's my streak?". Helper skills (SM-2 math, feedback formatter, DB updater, session analyzer) auto-load whenever Claude needs them during a session.
+1. **Type the slash command** (`/fluent-learn`, `/fluent-vocab`, etc.) — you explicitly start a session. Learner-facing skills are gated so they only run this way. No accidental 20-minute session triggered by a chat message.
+2. **Ask naturally** — read-only skills like `/fluent-progress` auto-trigger when you ask "how am I doing?" or "what's my streak?". Helper skills (SM-2 math, feedback formatter, DB updater, session analyzer) auto-load whenever Claude needs them during a session.
 
 All 12 skills appear in your `/` menu so you can always invoke any of them manually.
 
@@ -200,24 +200,24 @@ These are the commands you'll use daily. Each is backed by a dedicated skill und
 
 | Command | What It Does | When & Why to Use It |
 |---------|--------------|----------------------|
-| **`/setup`** | **One-time onboarding** - Asks you questions about your name, target language, current level, goals, and timeline. Creates your personalized learning profile. | **First time only** - Run this once to set up your account. The system generates a custom learning plan based on your answers. |
-| **`/learn`** | **Adaptive mixed practice** - Combines different exercise types (vocabulary, grammar, sentences) based on your weak areas. Adjusts difficulty in real-time based on your performance. | **Daily core practice** - Your main command for general improvement. The AI decides what you need to practice most. Best after `/review`. |
-| **`/review`** | **Spaced repetition session** - Shows you items that are due for review today based on the SM-2 algorithm. Focuses on things you learned before that need reinforcement. | **Start every day here!** - Review before learning new content. This is scientifically proven to be the most effective way to retain what you've learned. |
+| **`/fluent-setup`** | **One-time onboarding** - Asks you questions about your name, target language, current level, goals, and timeline. Creates your personalized learning profile. | **First time only** - Run this once to set up your account. The system generates a custom learning plan based on your answers. |
+| **`/fluent-learn`** | **Adaptive mixed practice** - Combines different exercise types (vocabulary, grammar, sentences) based on your weak areas. Adjusts difficulty in real-time based on your performance. | **Daily core practice** - Your main command for general improvement. The AI decides what you need to practice most. Best after `/fluent-review`. |
+| **`/fluent-review`** | **Spaced repetition session** - Shows you items that are due for review today based on the SM-2 algorithm. Focuses on things you learned before that need reinforcement. | **Start every day here!** - Review before learning new content. This is scientifically proven to be the most effective way to retain what you've learned. |
 
 #### Skill-Specific Commands
 
 | Command | What It Does | When & Why to Use It |
 |---------|--------------|----------------------|
-| **`/vocab`** | **Flashcard-style vocabulary drills** - Rapid-fire translation practice (target language ↔ native language). Tracks which words you struggle with. | **2-3x per week** - When you need to build vocabulary quickly. Great for preparing for specific topics (travel, business, etc.). |
-| **`/writing`** | **Writing practice** - Practice emails, letters, essays, or forms in your target language. Get detailed corrections with grammar explanations. | **Daily for exam prep** - Essential if you're preparing for language exams. Also great for building confidence in real-world communication. |
-| **`/speaking`** | **Conversation practice** - Role-play scenarios through typed dialogue. Practice natural conversations, asking for directions, ordering food, etc. | **2-3x per week** - Builds confidence for real conversations. Typed practice helps you think through responses without pressure. |
-| **`/reading`** | **Reading comprehension** - Read short texts (stories, articles, dialogues) then answer comprehension questions. Expands vocabulary in context. | **2-3x per week** - Improves overall understanding. Best for intermediate+ learners. Reading is one of the fastest ways to absorb grammar patterns. |
+| **`/fluent-vocab`** | **Flashcard-style vocabulary drills** - Rapid-fire translation practice (target language ↔ native language). Tracks which words you struggle with. | **2-3x per week** - When you need to build vocabulary quickly. Great for preparing for specific topics (travel, business, etc.). |
+| **`/fluent-writing`** | **Writing practice** - Practice emails, letters, essays, or forms in your target language. Get detailed corrections with grammar explanations. | **Daily for exam prep** - Essential if you're preparing for language exams. Also great for building confidence in real-world communication. |
+| **`/fluent-speaking`** | **Conversation practice** - Role-play scenarios through typed dialogue. Practice natural conversations, asking for directions, ordering food, etc. | **2-3x per week** - Builds confidence for real conversations. Typed practice helps you think through responses without pressure. |
+| **`/fluent-reading`** | **Reading comprehension** - Read short texts (stories, articles, dialogues) then answer comprehension questions. Expands vocabulary in context. | **2-3x per week** - Improves overall understanding. Best for intermediate+ learners. Reading is one of the fastest ways to absorb grammar patterns. |
 
 #### Progress Command
 
 | Command | What It Does | When & Why to Use It |
 |---------|--------------|----------------------|
-| **`/progress`** | **Statistics dashboard** - Shows your accuracy trends, streak days, mastery levels, achievements unlocked, and weak areas. Visual progress charts. | **Weekly check-in** - Read-only and safe to auto-invoke. Ask "how am I doing?" and Claude will open the dashboard automatically. |
+| **`/fluent-progress`** | **Statistics dashboard** - Shows your accuracy trends, streak days, mastery levels, achievements unlocked, and weak areas. Visual progress charts. | **Weekly check-in** - Read-only and safe to auto-invoke. Ask "how am I doing?" and Claude will open the dashboard automatically. |
 
 ### Helper skills (behind the scenes)
 
@@ -225,30 +225,30 @@ These skills don't change what the learner-facing commands do — they let Claud
 
 | Skill | What It Does | When It Runs |
 |-------|--------------|--------------|
-| **`/sm2-calculator`** | SM-2 spaced-repetition algorithm reference: quality scale, interval formula, easiness-factor update, mastery-level transitions. | Auto-loaded whenever a review item is scored. |
-| **`/feedback-formatter`** | Canonical per-answer feedback template — severity tagging (🔴 critical / 🟡 moderate / 🟢 minor), category labels, tone rules. | Auto-loaded every time Claude grades an answer. |
-| **`/db-updater`** | How to call `update-db.py` with a single JSON payload that atomically updates all 6 databases at session end. | Auto-loaded when a session ends. |
-| **`/session-analyzer`** | Parses `/results/{skill}-session-{ID}.md` files to extract error patterns, strengths, and focus areas for the next session. | Auto-loaded when planning the next session. |
+| **`/fluent-sm2-calculator`** | SM-2 spaced-repetition algorithm reference: quality scale, interval formula, easiness-factor update, mastery-level transitions. | Auto-loaded whenever a review item is scored. |
+| **`/fluent-feedback-formatter`** | Canonical per-answer feedback template — severity tagging (🔴 critical / 🟡 moderate / 🟢 minor), category labels, tone rules. | Auto-loaded every time Claude grades an answer. |
+| **`/fluent-db-updater`** | How to call `update-db.py` with a single JSON payload that atomically updates all 6 databases at session end. | Auto-loaded when a session ends. |
+| **`/fluent-session-analyzer`** | Parses `/results/fluent-{skill}-session-{ID}.md` files to extract error patterns, strengths, and focus areas for the next session. | Auto-loaded when planning the next session. |
 
 ### 📅 Recommended Daily Routine
 
 **🌅 Morning Session (15 min)**
 ```bash
-/review    # Must do first - Review what you learned before
-/vocab     # Learn 5-10 new words
+/fluent-review    # Must do first - Review what you learned before
+/fluent-vocab     # Learn 5-10 new words
 ```
 **Why?** Your brain is fresh. Reviewing first reinforces old knowledge, then new vocabulary sticks better.
 
 **🌙 Evening Session (15 min)**
 ```bash
-/writing   # Practice real-world writing
-/learn     # Let AI choose what you need most
+/fluent-writing   # Practice real-world writing
+/fluent-learn     # Let AI choose what you need most
 ```
-**Why?** Writing solidifies what you learned today. `/learn` fills in any gaps.
+**Why?** Writing solidifies what you learned today. `/fluent-learn` fills in any gaps.
 
 **📊 Weekly Check-In (5 min)**
 ```bash
-/progress  # See your stats and celebrate progress!
+/fluent-progress  # See your stats and celebrate progress!
 ```
 **Why?** Seeing improvement = motivation. You need to see you're getting better!
 
@@ -258,16 +258,16 @@ These skills don't change what the learner-facing commands do — they let Claud
 
 ### Data Layer (`/data` directory)
 
-**Your learning data is tracked in 6 JSON databases** (created automatically by `/setup`):
+**Your learning data is tracked in 6 JSON databases** (created automatically by `/fluent-setup`):
 
 | File | Purpose | Created When |
 |------|---------|--------------|
-| `learner-profile.json` | Your info, level, preferences, streak | `/setup` - One time |
-| `progress-db.json` | Overall statistics and trends | `/setup` - Updated every session |
-| `mistakes-db.json` | Error patterns with frequency and examples | `/setup` - Updated when you make mistakes |
-| `mastery-db.json` | Skill mastery levels (0-5 stars) | `/setup` - Updated after practice |
-| `spaced-repetition.json` | Review queue (SM-2 algorithm) | `/setup` - Updated after each answer |
-| `session-log.json` | Complete session history | `/setup` - New entry each session |
+| `learner-profile.json` | Your info, level, preferences, streak | `/fluent-setup` - One time |
+| `progress-db.json` | Overall statistics and trends | `/fluent-setup` - Updated every session |
+| `mistakes-db.json` | Error patterns with frequency and examples | `/fluent-setup` - Updated when you make mistakes |
+| `mastery-db.json` | Skill mastery levels (0-5 stars) | `/fluent-setup` - Updated after practice |
+| `spaced-repetition.json` | Review queue (SM-2 algorithm) | `/fluent-setup` - Updated after each answer |
+| `session-log.json` | Complete session history | `/fluent-setup` - New entry each session |
 
 **📋 Want to see the structure?** Check `/data-examples/` for template files showing the complete schema.
 
@@ -284,10 +284,10 @@ The AI follows these guides:
 
 ### Interface Layer
 
-- **Skills** (`.claude/skills/`) — 12 skills total. 8 learner-facing (`/setup`, `/learn`, `/vocab`, `/writing`, `/speaking`, `/reading`, `/review`, `/progress`) run when you invoke them. 4 helper skills (`/sm2-calculator`, `/feedback-formatter`, `/db-updater`, `/session-analyzer`) auto-load whenever Claude needs them during a session — and are also directly `/`-invokable if you want to read the reference.
+- **Skills** (`.claude/skills/`) — 12 skills total. 8 learner-facing (`/fluent-setup`, `/fluent-learn`, `/fluent-vocab`, `/fluent-writing`, `/fluent-speaking`, `/fluent-reading`, `/fluent-review`, `/fluent-progress`) run when you invoke them. 4 helper skills (`/fluent-sm2-calculator`, `/fluent-feedback-formatter`, `/fluent-db-updater`, `/fluent-session-analyzer`) auto-load whenever Claude needs them during a session — and are also directly `/`-invokable if you want to read the reference.
 - **Plugin manifests** (`.claude-plugin/`) — `plugin.json` + `marketplace.json` make Fluent installable via `/plugin marketplace add m98/fluent`.
 - **Automatic Hooks** (`.claude/hooks/`) — SessionStart welcome, SessionEnd backups, PostToolUse JSON validation + backups, PreCompact safety backup. Both `hooks.json` (plugin mode) and `.claude/settings.json` (clone mode) wire them up.
-- **Session Results** (`/results/`) — Detailed practice logs per session, parsed by `session-analyzer` to plan future sessions.
+- **Session Results** (`/results/`) — Detailed practice logs per session, parsed by `fluent-session-analyzer` to plan future sessions.
 
 ---
 
@@ -504,7 +504,7 @@ Or from inside a session: `/plugin list`. If the plugin is disabled, enable it: 
 A: It’s ultra-minimalistic, just a terminal and pure learning. No extra distributions, no ads, no gimmicks. Infinitely adaptable. You ask it to teach you something, and it does. And best of all, everything stays private on your machine.
 
 **Q: Do I need to know how to code?**
-A: No! Just install Claude Code and run `/setup`. That's it.
+A: No! Just install Claude Code and run `/fluent-setup`. That's it.
 
 **Q: How long until I see progress?**
 A: Most learners see measurable improvement within the first week. The system tracks everything so you can see exactly how you're improving.
@@ -532,5 +532,5 @@ But feel free to experiment and share your findings!
 git clone https://github.com/m98/fluent.git
 cd fluent
 claude
-/setup
+/fluent-setup
 ```

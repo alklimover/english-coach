@@ -1,6 +1,6 @@
 ---
-name: speaking
-description: Run an interactive typed conversation session simulating spoken practice — free-flowing dialogue, role-plays, and opinion questions prioritizing communication over perfect grammar. Triggered only when the learner types /speaking. Asks questions one at a time in the target language, evaluates clarity and naturalness first and grammar second, and updates all databases at the end.
+name: fluent-speaking
+description: Run an interactive typed conversation session simulating spoken practice — free-flowing dialogue, role-plays, and opinion questions prioritizing communication over perfect grammar. Triggered only when the learner types /fluent-speaking. Asks questions one at a time in the target language, evaluates clarity and naturalness first and grammar second, and updates all databases at the end.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
@@ -9,13 +9,13 @@ disable-model-invocation: true
 
 ## Overview
 
-Conversational practice through typed dialogue. Unlike `/writing`, prioritize **communication and naturalness** — grammar errors that don't block meaning are downplayed. Goal: build the learner's confidence to produce target-language output without over-analyzing.
+Conversational practice through typed dialogue. Unlike `/fluent-writing`, prioritize **communication and naturalness** — grammar errors that don't block meaning are downplayed. Goal: build the learner's confidence to produce target-language output without over-analyzing.
 
 ## When to Use
 
-Trigger this skill only when the learner types `/speaking`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+Trigger this skill only when the learner types `/fluent-speaking`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
 
-Skip this skill below A1 mastery 2 — the learner needs a basic word bank and verb conjugations first (run `/vocab` a few times).
+Skip this skill below A1 mastery 2 — the learner needs a basic word bank and verb conjugations first (run `/fluent-vocab` a few times).
 
 ## Instructions
 
@@ -85,7 +85,7 @@ Check in this order:
 2. **Grammar** (0-3 points): verb conjugation, word order, articles. Note but don't belabor.
 3. **Vocabulary** (0-2 points): appropriate word choice, no English mixing.
 
-Feedback template (variant of `feedback-formatter`):
+Feedback template (variant of `fluent-feedback-formatter`):
 
 ```markdown
 {✅ or 🟡} {one-line encouragement}
@@ -158,14 +158,14 @@ Ready? I'll start...
 
 ### 8. Update all databases
 
-Use the `db-updater` skill:
+Use the `fluent-db-updater` skill:
 
-- `command_used: "/speaking"`, `skills_practiced: ["speaking"]`
+- `command_used: "/fluent-speaking"`, `skills_practiced: ["speaking"]`
 - `skill_scores.speaking: {exercises: N, correct: count_of_clear_answers, time_minutes}`
 - `errors[]` — only communication-blocking ones (don't flood mistakes-db with minor speaking slips)
 - `focus_next_session[]` — one topic + one pattern
 
-Save exchange to `/results/speaking-session-{NNN}.md`.
+Save exchange to `/results/fluent-speaking-session-{NNN}.md`.
 
 ## Examples
 
@@ -218,7 +218,7 @@ Learner: "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
 - **Stay in the target language** for questions and transitions. Drop to native only for explanations.
 - **Praise natural expression.** If the learner uses "Nou..." or "Eh..." correctly, call it out — those are fluency markers.
 - **Don't over-correct.** A speaking session with 20 red marks kills confidence.
-- **Never auto-invoke.** Gated; must fire only on explicit `/speaking`.
+- **Never auto-invoke.** Gated; must fire only on explicit `/fluent-speaking`.
 
 ## Language Reference
 

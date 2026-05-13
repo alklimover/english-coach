@@ -1,6 +1,6 @@
 ---
-name: review
-description: Run today's spaced-repetition review queue — items scheduled by SM-2 that need reinforcement before the learner forgets them. Triggered only when the learner types /review. Pulls due items from spaced-repetition.review_queue.today, generates a targeted exercise for each, evaluates the response, updates SM-2 parameters, and reshelves items into the correct future queue.
+name: fluent-review
+description: Run today's spaced-repetition review queue — items scheduled by SM-2 that need reinforcement before the learner forgets them. Triggered only when the learner types /fluent-review. Pulls due items from spaced-repetition.review_queue.today, generates a targeted exercise for each, evaluates the response, updates SM-2 parameters, and reshelves items into the correct future queue.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
@@ -13,9 +13,9 @@ Replay items the learner learned before, timed so they hit just before the forge
 
 ## When to Use
 
-Trigger this skill only when the learner types `/review`. The skill is gated with `disable-model-invocation: true` — mutating SM-2 state from a misread prompt would cascade through every future session.
+Trigger this skill only when the learner types `/fluent-review`. The skill is gated with `disable-model-invocation: true` — mutating SM-2 state from a misread prompt would cascade through every future session.
 
-Skip this skill when the queue is empty — suggest `/vocab` or `/learn` instead.
+Skip this skill when the queue is empty — suggest `/fluent-vocab` or `/fluent-learn` instead.
 
 ## Instructions
 
@@ -33,9 +33,9 @@ If the queue is empty:
 🎉 No reviews due today! Your spaced repetition is up to date.
 
 Want to practice something new? Try:
-- `/learn` — adaptive mixed practice
-- `/vocab` — learn new words
-- `/progress` — see your stats
+- `/fluent-learn` — adaptive mixed practice
+- `/fluent-vocab` — learn new words
+- `/fluent-progress` — see your stats
 ```
 
 ### 2. Opening
@@ -93,15 +93,15 @@ Present one at a time:
 
 ### 4. Evaluate + update SM-2
 
-Use the `feedback-formatter` skill for per-answer feedback.
+Use the `fluent-feedback-formatter` skill for per-answer feedback.
 
-Then stage the item for the end-of-session update. Do NOT hand-edit `spaced-repetition.json` — use `review_results[]` in the `db-updater` payload:
+Then stage the item for the end-of-session update. Do NOT hand-edit `spaced-repetition.json` — use `review_results[]` in the `fluent-db-updater` payload:
 
 ```json
 { "item_id": "vocab_huis", "quality": 4 }
 ```
 
-The `update-db.py` script runs the SM-2 math (see `sm2-calculator` skill) and rebuilds the queue. Mapping: `quality = floor(score / 2)`.
+The `update-db.py` script runs the SM-2 math (see `fluent-sm2-calculator` skill) and rebuilds the queue. Mapping: `quality = floor(score / 2)`.
 
 ### 5. Progress pulse every 5 items
 
@@ -144,15 +144,15 @@ Keep going! 💪
 
 ### 7. Update all databases
 
-Use the `db-updater` skill:
+Use the `fluent-db-updater` skill:
 
-- `command_used: "/review"`, `skills_practiced: [derived from reviewed items]`
+- `command_used: "/fluent-review"`, `skills_practiced: [derived from reviewed items]`
 - `skill_scores` — aggregate per skill touched
 - `review_results[]` — every item reviewed, with `quality`
 - `errors[]` — only patterns where the learner got it wrong (bumps frequency)
 - `focus_next_session[]` — the 2-3 items with lowest quality this session
 
-Save exchange to `/results/review-session-{NNN}.md` for later analysis.
+Save exchange to `/results/fluent-review-session-{NNN}.md` for later analysis.
 
 ## Examples
 
@@ -204,8 +204,8 @@ Learner: "niet"
 
 ## Critical Rules
 
-- **Daily.** The whole system assumes the learner runs `/review` every day. Missing a day breaks the intended spacing.
-- **Never auto-invoke.** Gated; must fire only on explicit `/review`. Long interactive + SM-2 mutation.
+- **Daily.** The whole system assumes the learner runs `/fluent-review` every day. Missing a day breaks the intended spacing.
+- **Never auto-invoke.** Gated; must fire only on explicit `/fluent-review`. Long interactive + SM-2 mutation.
 - **One item at a time.** Rushing = false positives.
 - **Let the learner struggle.** If they don't remember, that's useful data (quality 0-2). The algorithm needs honest signals.
 - **Never hand-edit `spaced-repetition.json`.** Queue is rebuilt on every `update-db.py` call.

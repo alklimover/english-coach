@@ -1,5 +1,5 @@
 ---
-name: session-analyzer
+name: fluent-session-analyzer
 description: Parse Fluent `/results/*.md` session files to extract error patterns, strengths, accuracy trends, and focus areas for the next session. Use when the tutor needs to analyze the learner's recent performance — planning the next lesson, recommending focus areas, or answering "what should I practice next?".
 ---
 
@@ -13,7 +13,7 @@ Every practice session writes a markdown report to `/results/{skill}-session-{ID
 
 Load this skill whenever the tutor:
 
-- Plans today's focus before `/learn`, `/writing`, etc.
+- Plans today's focus before `/fluent-learn`, `/fluent-writing`, etc.
 - Answers the learner's question "what's my weakest area" or "what should I work on".
 - Generates the next session plan.
 

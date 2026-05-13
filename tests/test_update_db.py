@@ -111,7 +111,7 @@ SESSION_PAYLOAD = {
     "session_id": "session-002",
     "date": "2026-04-24",
     "duration_minutes": 15,
-    "command_used": "/learn",
+    "command_used": "/fluent-learn",
     "skills_practiced": ["vocabulary"],
     "skill_scores": {
         "vocabulary": {"exercises": 5, "correct": 4, "time_minutes": 15}

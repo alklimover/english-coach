@@ -1,6 +1,6 @@
 ---
-name: vocab
-description: Run an interactive vocabulary drill session with flashcard-style prompts, spaced repetition, and per-answer feedback. Triggered only when the learner types /vocab. Reads spaced-repetition / mistakes / mastery DBs to pick words, presents one word at a time, scores each answer, and calls db-updater at the end.
+name: fluent-vocab
+description: Run an interactive vocabulary drill session with flashcard-style prompts, spaced repetition, and per-answer feedback. Triggered only when the learner types /fluent-vocab. Reads spaced-repetition / mistakes / mastery DBs to pick words, presents one word at a time, scores each answer, and calls fluent-db-updater at the end.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
@@ -13,9 +13,9 @@ Flashcard-style vocabulary practice using spaced repetition. One word at a time,
 
 ## When to Use
 
-Trigger this skill only when the learner types `/vocab`. The skill is gated with `disable-model-invocation: true` — a false-positive auto-trigger would launch a 15-min interactive session and mutate 6 JSON databases. Not worth the risk.
+Trigger this skill only when the learner types `/fluent-vocab`. The skill is gated with `disable-model-invocation: true` — a false-positive auto-trigger would launch a 15-min interactive session and mutate 6 JSON databases. Not worth the risk.
 
-Skip this skill if no vocabulary items are due and no new words are queued — offer `/review` or `/learn` instead.
+Skip this skill if no vocabulary items are due and no new words are queued — offer `/fluent-review` or `/fluent-learn` instead.
 
 ## Instructions
 
@@ -32,7 +32,7 @@ If the helper is unavailable, resolve `<data_dir>` via `fluent_paths.data_dir()`
 - `<data_dir>/mastery-db.json`
 - `<data_dir>/learner-profile.json` (for target_language, name, level)
 
-If any are missing, direct the learner to `/setup` and stop.
+If any are missing, direct the learner to `/fluent-setup` and stop.
 
 ### 2. Select words
 
@@ -90,11 +90,11 @@ Rotate the three modes so the session is not monotonous.
 
 ### 4. Feedback after each answer
 
-Use the `feedback-formatter` skill's template. Score out of 10, tag severity.
+Use the `fluent-feedback-formatter` skill's template. Score out of 10, tag severity.
 
 Track the answer for the end-of-session DB update:
 
-- Add to `review_results[]` with `quality = floor(score / 2)` (see `sm2-calculator` skill).
+- Add to `review_results[]` with `quality = floor(score / 2)` (see `fluent-sm2-calculator` skill).
 - If the learner met a new word, stage it for `new_vocabulary[]`.
 - If the learner made an error, stage it for `errors[]`.
 
@@ -122,10 +122,10 @@ Do **not** call `update-db.py` after every word — batch at session end.
 
 ### 6. Update all databases
 
-Call the `db-updater` skill's workflow — one `update-db.py` invocation with:
+Call the `fluent-db-updater` skill's workflow — one `update-db.py` invocation with:
 
 - `session_id`, `date`, `duration_minutes`
-- `command_used: "/vocab"`
+- `command_used: "/fluent-vocab"`
 - `skills_practiced: ["vocabulary"]`
 - `skill_scores.vocabulary`: `{exercises, correct, time_minutes}`
 - `errors[]`, `new_vocabulary[]`, `review_results[]` collected during the session
@@ -189,11 +189,11 @@ Learner: "schrijven"
 ## Critical Rules
 
 - **One word at a time.** Wait for the learner's answer before showing the next.
-- **Immediate feedback** after each — use `feedback-formatter`.
+- **Immediate feedback** after each — use `fluent-feedback-formatter`.
 - **Mix modes.** Don't drill 20 recognition prompts in a row — interleave for discrimination.
 - **Use target language** for greetings + transitions when the learner is B1+; for A1-A2 mix target + native.
 - **Never** update the DBs mid-session — batch at end.
-- **Never auto-invoke.** This skill is gated; must fire only on explicit `/vocab`.
+- **Never auto-invoke.** This skill is gated; must fire only on explicit `/fluent-vocab`.
 
 ## Tips for the Learner (append if they seem tired or unsure)
 

@@ -57,7 +57,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 3. **Test the system:**
    ```bash
    claude
-   /setup
+   /fluent-setup
    ```
 
 4. **Make your changes and test thoroughly**
@@ -225,7 +225,7 @@ Fixes #456
 ### Testing Guidelines
 
 **Before submitting, test:**
-- Run `/setup` with different languages
+- Run `/fluent-setup` with different languages
 - Test all slash commands
 - Verify data is saved correctly
 - Check spaced repetition scheduling
@@ -234,14 +234,14 @@ Fixes #456
 
 **Testing checklist:**
 ```markdown
-- [ ] /setup completes successfully
-- [ ] /learn session works
-- [ ] /review shows correct items
-- [ ] /vocab tracks correctly
-- [ ] /writing provides feedback
-- [ ] /speaking records patterns
-- [ ] /reading tests comprehension
-- [ ] /progress shows statistics
+- [ ] /fluent-setup completes successfully
+- [ ] /fluent-learn session works
+- [ ] /fluent-review shows correct items
+- [ ] /fluent-vocab tracks correctly
+- [ ] /fluent-writing provides feedback
+- [ ] /fluent-speaking records patterns
+- [ ] /fluent-reading tests comprehension
+- [ ] /fluent-progress shows statistics
 - [ ] Data files update correctly
 - [ ] Hooks trigger as expected
 ```

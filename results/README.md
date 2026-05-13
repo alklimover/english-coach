@@ -133,6 +133,6 @@ Files are in **Markdown format** (`.md`):
 
 ---
 
-**Ready to practice?** Run `/learn` to create your first session result! 🚀
+**Ready to practice?** Run `/fluent-learn` to create your first session result! 🚀
 
 *Session results are created automatically at the end of each practice session.*

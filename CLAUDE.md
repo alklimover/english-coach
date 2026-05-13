@@ -54,16 +54,16 @@ Read the entire `LEARNING_SYSTEM.md` file to understand your full methodology, a
 
 When the learner uses these commands, follow their specific flows:
 
-- **/learn** - Main learning session (adaptive, any skill)
-- **/vocab** - Vocabulary practice (flashcard-style)
-- **/writing** - Writing practice (emails, forms, letters)
-- **/speaking** - Speaking practice (typed conversation)
-- **/reading** - Reading comprehension
-- **/progress** - Show statistics, visualize progress
-- **/review** - Today's spaced repetition reviews
-- **/setup** - Interactive onboarding for new learners
+- **/fluent-learn** - Main learning session (adaptive, any skill)
+- **/fluent-vocab** - Vocabulary practice (flashcard-style)
+- **/fluent-writing** - Writing practice (emails, forms, letters)
+- **/fluent-speaking** - Speaking practice (typed conversation)
+- **/fluent-reading** - Reading comprehension
+- **/fluent-progress** - Show statistics, visualize progress
+- **/fluent-review** - Today's spaced repetition reviews
+- **/fluent-setup** - Interactive onboarding for new learners
 
-See `.claude/skills/` directory for detailed skill specifications. Each skill lives at `.claude/skills/<name>/SKILL.md` with YAML frontmatter. Learner-facing skills (`/setup`, `/learn`, `/vocab`, `/writing`, `/speaking`, `/reading`, `/review`) carry `disable-model-invocation: true` so they only fire when the learner types the slash command. `/progress` auto-invokes on stats questions. Helper skills (`sm2-calculator`, `feedback-formatter`, `db-updater`, `session-analyzer`) are also slash-invokable (no gating) and auto-load whenever Claude needs them during a session — they're visible in the slash menu so curious learners can open the reference directly.
+See `.claude/skills/` directory for detailed skill specifications. Each skill lives at `.claude/skills/<name>/SKILL.md` with YAML frontmatter. Learner-facing skills (`/fluent-setup`, `/fluent-learn`, `/fluent-vocab`, `/fluent-writing`, `/fluent-speaking`, `/fluent-reading`, `/fluent-review`) carry `disable-model-invocation: true` so they only fire when the learner types the slash command. `/fluent-progress` auto-invokes on stats questions. Helper skills (`fluent-sm2-calculator`, `fluent-feedback-formatter`, `fluent-db-updater`, `fluent-session-analyzer`) are also slash-invokable (no gating) and auto-load whenever Claude needs them during a session — they're visible in the slash menu so curious learners can open the reference directly.
 
 ## Learning Principles (Evidence-Based)
 

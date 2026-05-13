@@ -6,7 +6,7 @@ This directory contains your personal learning data in JSON format.
 
 **This directory is empty by design!**
 
-When you run `/setup` for the first time, the system will automatically create:
+When you run `/fluent-setup` for the first time, the system will automatically create:
 
 - `learner-profile.json` - Your name, target language, level, goals
 - `progress-db.json` - Overall statistics and trends
@@ -110,14 +110,14 @@ Complete history of all practice sessions:
 
 ## 🔄 How It Works
 
-1. **First time:** Run `/setup` to create your profile
+1. **First time:** Run `/fluent-setup` to create your profile
 2. **Every session:** Files update automatically as you practice
 3. **Backup:** Automatic backups to `.backups/` via hooks
 4. **Export:** All data is JSON - easy to analyze or migrate
 
 ## 📁 Data Examples
 
-Want to see the structure before running `/setup`?
+Want to see the structure before running `/fluent-setup`?
 
 Check the `/data-examples` directory for template files with the complete schema.
 
@@ -125,9 +125,9 @@ Check the `/data-examples` directory for template files with the complete schema
 
 - **Never edit these files manually** - Let the system manage them
 - **Don't delete while learning** - You'll lose your progress!
-- **To reset:** Delete all `.json` files and run `/setup` again
+- **To reset:** Delete all `.json` files and run `/fluent-setup` again
 - **To backup:** Copy entire `/data` directory
 
 ---
 
-**Ready to start?** Run `/setup` to begin your language learning journey! 🚀
+**Ready to start?** Run `/fluent-setup` to begin your language learning journey! 🚀

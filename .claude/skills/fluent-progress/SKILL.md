@@ -1,6 +1,6 @@
 ---
-name: progress
-description: Show the learner's language learning progress, statistics, mastery levels, streak, and achievements. Use when the learner asks "how am I doing", "show my progress", "stats", "dashboard", "what's my streak", "how many words have I learned", or invokes /progress. Read-only — safe to auto-invoke.
+name: fluent-progress
+description: Show the learner's language learning progress, statistics, mastery levels, streak, and achievements. Use when the learner asks "how am I doing", "show my progress", "stats", "dashboard", "what's my streak", "how many words have I learned", or invokes /fluent-progress. Read-only — safe to auto-invoke.
 allowed-tools: Read, Bash
 ---
 
@@ -14,7 +14,7 @@ Show the learner a comprehensive, personalized progress report with visual stati
 
 Trigger this skill when:
 
-- Learner types `/progress`.
+- Learner types `/fluent-progress`.
 - Learner asks about their progress, statistics, streak, mastery, achievements, or how they're improving.
 - Learner asks "how am I doing", "show me my stats", "am I getting better".
 - After a session ends, if the learner wants a broader view than the session summary.
@@ -42,7 +42,7 @@ If the helper is unavailable, fall back to reading each file directly. Resolve t
 - `<data_dir>/spaced-repetition.json`
 - `<data_dir>/session-log.json`
 
-If any are missing, point the learner at `/setup` and stop.
+If any are missing, point the learner at `/fluent-setup` and stop.
 
 ### 2. Generate the report
 
@@ -202,7 +202,7 @@ Append this only if the learner seems new or asks what the numbers mean:
 >
 > Speaking / Writing / Reading: Not yet practiced.
 >
-> **Items Due Today:** 6 — run `/review` first.
+> **Items Due Today:** 6 — run `/fluent-review` first.
 >
 > "Three days in a row — momentum matters. Keep going!"
 

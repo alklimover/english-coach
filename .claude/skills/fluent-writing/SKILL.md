@@ -1,6 +1,6 @@
 ---
-name: writing
-description: Run an interactive writing practice session (emails, letters, forms, short texts) with systematic error analysis, category-tagged corrections, and detailed feedback. Triggered only when the learner types /writing. Selects a scenario matched to mastery, lets the learner compose, then analyzes grammar, register, vocabulary, structure, and spelling before updating all databases.
+name: fluent-writing
+description: Run an interactive writing practice session (emails, letters, forms, short texts) with systematic error analysis, category-tagged corrections, and detailed feedback. Triggered only when the learner types /fluent-writing. Selects a scenario matched to mastery, lets the learner compose, then analyzes grammar, register, vocabulary, structure, and spelling before updating all databases.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
@@ -13,9 +13,9 @@ Full-text writing practice with systematic correction. One scenario per session,
 
 ## When to Use
 
-Trigger this skill only when the learner types `/writing`. The skill is gated with `disable-model-invocation: true` — a 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+Trigger this skill only when the learner types `/fluent-writing`. The skill is gated with `disable-model-invocation: true` — a 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
 
-Skip this skill in favor of `/vocab` if the learner has not yet hit mastery 2 in basic vocabulary — writing needs a minimum word bank.
+Skip this skill in favor of `/fluent-vocab` if the learner has not yet hit mastery 2 in basic vocabulary — writing needs a minimum word bank.
 
 ## Instructions
 
@@ -78,7 +78,7 @@ Tag each finding with a severity: 🔴 critical, 🟡 moderate, 🟢 minor.
 
 ### 6. Detailed feedback
 
-Diverges slightly from the standard `feedback-formatter` template because writing answers are multi-sentence. Use this variant:
+Diverges slightly from the standard `fluent-feedback-formatter` template because writing answers are multi-sentence. Use this variant:
 
 ```markdown
 ## Feedback
@@ -146,14 +146,14 @@ Type "rewrite" to try again, or "next" to continue.
 
 ### 9. Update all databases
 
-Use the `db-updater` skill:
+Use the `fluent-db-updater` skill:
 
-- `command_used: "/writing"`, `skills_practiced: ["writing"]`
+- `command_used: "/fluent-writing"`, `skills_practiced: ["writing"]`
 - `skill_scores.writing: {exercises: 1, correct: 1_if_score_≥_7_else_0, time_minutes}`
 - `errors[]` — one per distinct pattern found (dedupe; the script bumps frequency)
 - `focus_next_session[]` — top 2 patterns to drill
 
-Also save the exchange as `/results/writing-session-{NNN}.md` with the full task, the learner's original text, the corrected version, and the error table. The `session-analyzer` skill depends on this format.
+Also save the exchange as `/results/fluent-writing-session-{NNN}.md` with the full task, the learner's original text, the corrected version, and the error table. The `fluent-session-analyzer` skill depends on this format.
 
 ## Examples
 
@@ -216,8 +216,8 @@ Learner: "Hallo, Ik schrijf je omdat ik kan niet komen op donderdag. Ik ben ziek
 - **One scenario per session.** Don't chain multiple writing tasks — depth over breadth.
 - **Wait for the full answer** before correcting.
 - **Severity tagging is mandatory.** Fed into `mistakes-db` and drives spaced repetition priority.
-- **Always save the session file** in `/results/` for later analysis by `session-analyzer`.
-- **Never auto-invoke.** This skill is gated; must fire only on explicit `/writing`.
+- **Always save the session file** in `/results/` for later analysis by `fluent-session-analyzer`.
+- **Never auto-invoke.** This skill is gated; must fire only on explicit `/fluent-writing`.
 
 ## Language Reference
 

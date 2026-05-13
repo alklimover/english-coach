@@ -1,6 +1,6 @@
 ---
-name: learn
-description: Main adaptive language-learning session that mixes skills (writing, speaking, vocabulary, reading) and exercise types based on the learner's current level, weak patterns, and due reviews. Triggered only when the learner types /learn. Greets the learner, shows today's plan, asks what to practice, runs interleaved exercises one at a time, and updates all databases at the end.
+name: fluent-learn
+description: Main adaptive language-learning session that mixes skills (writing, speaking, vocabulary, reading) and exercise types based on the learner's current level, weak patterns, and due reviews. Triggered only when the learner types /fluent-learn. Greets the learner, shows today's plan, asks what to practice, runs interleaved exercises one at a time, and updates all databases at the end.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
@@ -13,9 +13,9 @@ The flagship command. Interleaves skills, adapts difficulty per answer, and cove
 
 ## When to Use
 
-Trigger this skill only when the learner types `/learn`. The skill is gated with `disable-model-invocation: true` — an ambiguous auto-trigger would launch a 20-min interactive session and mutate 6 JSON databases.
+Trigger this skill only when the learner types `/fluent-learn`. The skill is gated with `disable-model-invocation: true` — an ambiguous auto-trigger would launch a 20-min interactive session and mutate 6 JSON databases.
 
-Skip this skill the very first time a learner runs the system — route to `/setup` instead.
+Skip this skill the very first time a learner runs the system — route to `/fluent-setup` instead.
 
 ## Instructions
 
@@ -25,7 +25,7 @@ Skip this skill the very first time a learner runs the system — route to `/set
 python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/read-db.py"
 ```
 
-Need all 6 DBs. If any missing, direct the learner to `/setup` and stop.
+Need all 6 DBs. If any missing, direct the learner to `/fluent-setup` and stop.
 
 ### 2. Analyze today's plan
 
@@ -60,7 +60,7 @@ Need all 6 DBs. If any missing, direct the learner to `/setup` and stop.
 
 ### 4. Route
 
-- 1-5 → hand off to the matching skill (`writing`, `speaking`, `vocab`, `reading`, `review`). Those skills cover everything needed; this skill's job here is just to dispatch.
+- 1-5 → hand off to the matching skill (`fluent-writing`, `fluent-speaking`, `fluent-vocab`, `fluent-reading`, `fluent-review`). Those skills cover everything needed; this skill's job here is just to dispatch.
 - 6 (adaptive mix) → use this skill's own exercise sequencer (below).
 
 ### 5. Adaptive mix (option 6)
@@ -72,9 +72,9 @@ Plan a 20-min session:
 3. **Targeted drill 2 (5 min)** — second weak pattern. Same structure.
 4. **Integration (5 min)** — short writing or speaking task that forces both patterns together.
 
-Run one exercise at a time with immediate feedback via `feedback-formatter`.
+Run one exercise at a time with immediate feedback via `fluent-feedback-formatter`.
 
-Use `session-analyzer` to choose which patterns to target.
+Use `fluent-session-analyzer` to choose which patterns to target.
 
 ### 6. Adaptive difficulty
 
@@ -109,7 +109,7 @@ elif mastery_level >= 4:
 
 ### 8. Per-answer feedback
 
-Use `feedback-formatter` template. Score 0-10 + severity tag. Stage for end-of-session update.
+Use `fluent-feedback-formatter` template. Score 0-10 + severity tag. Stage for end-of-session update.
 
 Also prompt the learner to **retype** the correct form after a critical mistake — motor memory helps:
 
@@ -139,15 +139,15 @@ Now type the correct version yourself: "{correct_sentence}"
 {goodbye in target language}! 👏
 ```
 
-Then use the `db-updater` skill:
+Then use the `fluent-db-updater` skill:
 
-- `command_used: "/learn"`
+- `command_used: "/fluent-learn"`
 - `skills_practiced: [all skills touched]`
 - `skill_scores` per skill
 - `errors[]`, `new_vocabulary[]`, `review_results[]`
 - `breakthroughs[]`, `focus_next_session[]`, `session_notes`
 
-Save exchange to `/results/learn-session-{NNN}.md`.
+Save exchange to `/results/fluent-learn-session-{NNN}.md`.
 
 ## Examples
 
@@ -190,7 +190,7 @@ After 4 exercises, accuracy is 55% (target zone). Hold difficulty; introduce pat
 - **Always load all 6 DBs at start.** Missing context → generic, demotivating content.
 - **One exercise at a time.**
 - **Interleave.** Don't drill one pattern for 20 min — mix 2-3 patterns to force discrimination.
-- **Use the helper skills** (`sm2-calculator`, `feedback-formatter`, `db-updater`, `session-analyzer`) — don't reimplement.
+- **Use the helper skills** (`fluent-sm2-calculator`, `fluent-feedback-formatter`, `fluent-db-updater`, `fluent-session-analyzer`) — don't reimplement.
 - **Use the learner's name + target-language greetings** throughout.
 - **Celebrate progress.** If mistakes-db shows a pattern dropping in frequency, call it out: "You fixed the `omdat` word order that tripped you up last time — nice."
 

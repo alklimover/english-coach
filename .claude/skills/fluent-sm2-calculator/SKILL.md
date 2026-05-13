@@ -1,5 +1,5 @@
 ---
-name: sm2-calculator
+name: fluent-sm2-calculator
 description: SM-2 spaced-repetition algorithm reference for the Fluent language learning system. Use whenever the tutor schedules the next review of a vocabulary item, grammar rule, or error pattern — i.e. after every answered review question. Defines the 0-5 quality scale, interval formula, easiness-factor update, and mastery-level transitions that keep the spaced-repetition database correct.
 ---
 
@@ -18,7 +18,7 @@ Load this skill whenever the tutor:
 - Updates `easiness_factor`, `interval_days`, `repetitions`, or `mastery_level` on a spaced-repetition item.
 - Decides which queue (`today` / `tomorrow` / `this_week` / `later`) to place an item in.
 
-Skip this skill when the `db-updater` skill is already being used — the `update-db.py` script runs SM-2 internally.
+Skip this skill when the `fluent-db-updater` skill is already being used — the `update-db.py` script runs SM-2 internally.
 
 ## Instructions
 
@@ -98,7 +98,7 @@ If the learner got it wrong (quality < 3), keep the item in `review_queue.today`
 
 ### 7. Preferred implementation
 
-Do not hand-edit `spaced-repetition.json`. Call `.claude/hooks/update-db.py` with a `review_results` array — the script runs SM-2 atomically and rebuilds the queue. Only do manual math when the script is unavailable. See the `db-updater` skill for the payload schema.
+Do not hand-edit `spaced-repetition.json`. Call `.claude/hooks/update-db.py` with a `review_results` array — the script runs SM-2 atomically and rebuilds the queue. Only do manual math when the script is unavailable. See the `fluent-db-updater` skill for the payload schema.
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db.py" <<'EOF'

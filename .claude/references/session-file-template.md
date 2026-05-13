@@ -1,20 +1,22 @@
 # Session Result File Template
 
-Every practice skill saves its session to `/results/{skill}-session-{NNN}.md`. The `session-analyzer` skill parses these files to plan future sessions — so the format must be consistent.
+Every practice skill saves its session to `/results/fluent-{skill}-session-{NNN}.md`. The `fluent-session-analyzer` skill parses these files to plan future sessions — so the format must be consistent.
 
 ## File naming
 
 ```
-/results/{skill}-session-{NNN}.md
+/results/fluent-{skill}-session-{NNN}.md
 ```
 
 Examples:
-- `writing-session-012.md`
-- `vocab-session-005.md`
-- `speaking-session-003.md`
-- `review-session-042.md`
-- `learn-session-018.md`
-- `reading-session-007.md`
+- `fluent-writing-session-012.md`
+- `fluent-vocab-session-005.md`
+- `fluent-speaking-session-003.md`
+- `fluent-review-session-042.md`
+- `fluent-learn-session-018.md`
+- `fluent-reading-session-007.md`
+
+> Files created before v0.2.0 may use the older `{skill}-session-{NNN}.md` naming (no `fluent-` prefix). The analyzer reads both — do not rename existing files.
 
 `NNN` is the global session counter (not per-skill) — matches `session_id` in `session-log.json`.
 
@@ -26,7 +28,7 @@ Examples:
 **Date:** YYYY-MM-DD
 **Duration:** {X} minutes
 **Skill:** {writing/speaking/vocab/reading/review/learn}
-**Command:** {/writing, /speaking, etc.}
+**Command:** {/fluent-writing, /fluent-speaking, etc.}
 
 ---
 
@@ -85,7 +87,7 @@ Examples:
 
 ## Key parsing markers
 
-The `session-analyzer` skill relies on these exact markers being present:
+The `fluent-session-analyzer` skill relies on these exact markers being present:
 
 - `❌` — error line (parsed for category + severity)
 - `✅` — strength line
@@ -100,4 +102,4 @@ Do not rename these headings or reorder sections. Changes break the analyzer.
 
 Session files are **markdown narrative**. JSON databases (`mistakes-db.json`, `mastery-db.json`) hold aggregated counts and SM-2 state. Both must be updated — the markdown records the story, the JSON records the numbers.
 
-Call `.claude/hooks/update-db.py` once at session end with a full payload (see `db-updater-payload.example.json`). The script handles the JSON side; the practice skill handles the markdown side.
+Call `.claude/hooks/update-db.py` once at session end with a full payload (see `db-updater-payload.example.json`). The script handles the JSON side; the practice skill handles the markdown side. The `fluent-db-updater` skill documents the payload schema.

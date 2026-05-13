@@ -566,7 +566,7 @@ Show progress in fun ways:
    - Update skills.{skill_name}.last_practiced
 
 4. **Save session result file**:
-   - Create `/results/writing-session-{ID}.md` (or similar)
+   - Create `/results/fluent-writing-session-{ID}.md` (or similar)
    - Include all exercises, errors, feedback
    - Add tracking tables (like you did in session-001!)
 

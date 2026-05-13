@@ -1,6 +1,6 @@
 ---
-name: setup
-description: One-time interactive onboarding that creates the learner's personalized language-learning profile — name, target language, native language, current/target CEFR level, timeline, daily minutes, and learning goals. Triggered only when the learner types /setup. Also handles profile updates and resets for returning users. Must never auto-invoke because re-running can reset progress.
+name: fluent-setup
+description: One-time interactive onboarding that creates the learner's personalized language-learning profile — name, target language, native language, current/target CEFR level, timeline, daily minutes, and learning goals. Triggered only when the learner types /fluent-setup. Also handles profile updates and resets for returning users. Must never auto-invoke because re-running can reset progress.
 allowed-tools: Read, Write, Bash, AskUserQuestion
 disable-model-invocation: true
 ---
@@ -35,9 +35,9 @@ DATA = ensure_data_dir()
 
 ## When to Use
 
-Trigger this skill only when the learner types `/setup`. The skill is gated with `disable-model-invocation: true` — re-running can reset a learner's progress, so it must never auto-fire from an ambiguous prompt.
+Trigger this skill only when the learner types `/fluent-setup`. The skill is gated with `disable-model-invocation: true` — re-running can reset a learner's progress, so it must never auto-fire from an ambiguous prompt.
 
-Skip this skill if a profile already exists and the learner did not ask to change anything; route them to `/learn` or `/progress` instead.
+Skip this skill if a profile already exists and the learner did not ask to change anything; route them to `/fluent-learn` or `/fluent-progress` instead.
 
 ## Instructions
 
@@ -137,16 +137,16 @@ Present:
 
 ### Weekly Schedule
 **Daily:**
-- 🔄 `/review` — spaced repetition ({X} min)
-- 📚 `/vocab` — new vocabulary ({Y} min)
+- 🔄 `/fluent-review` — spaced repetition ({X} min)
+- 📚 `/fluent-vocab` — new vocabulary ({Y} min)
 
 **Alternating:**
-- 📝 `/writing` (Mon/Wed/Fri)
-- 🗣️ `/speaking` (Tue/Thu/Sat)
-- 📖 `/reading` (Sun)
+- 📝 `/fluent-writing` (Mon/Wed/Fri)
+- 🗣️ `/fluent-speaking` (Tue/Thu/Sat)
+- 📖 `/fluent-reading` (Sun)
 
 **Weekly:**
-- 📊 `/progress` — check stats (5 min)
+- 📊 `/fluent-progress` — check stats (5 min)
 
 ### Milestones
 - Month 1: {reasonable short-term}
@@ -155,9 +155,9 @@ Present:
 - Target date: {target_level}!
 
 ### Next Steps
-1. Start now — type `/learn`
-2. Daily habit — `/review` every day
-3. Weekly — `/progress` to see stats
+1. Start now — type `/fluent-learn`
+2. Daily habit — `/fluent-review` every day
+3. Weekly — `/fluent-progress` to see stats
 4. Stay consistent — even 10 min daily beats 2 hours weekly
 
 **Your journey to {target_language} fluency starts now!** 🚀
@@ -186,7 +186,7 @@ A quick 5-10 min intro session to learn your first 10 words and get familiar wit
 Type "yes" to start, "later" to begin on your own.
 ```
 
-If yes, hand off to the `learn` skill.
+If yes, hand off to the `fluent-learn` skill.
 
 ## Profile Updates (existing profile)
 
@@ -227,7 +227,7 @@ What would you like to do?
 
 ### Example 1 — first-time setup flow
 
-Learner runs `/setup`. After collecting all 11 answers, compute months, generate plan, write 6 JSON files, offer first lesson.
+Learner runs `/fluent-setup`. After collecting all 11 answers, compute months, generate plan, write 6 JSON files, offer first lesson.
 
 ### Example 2 — returning-user profile reset
 
@@ -243,7 +243,7 @@ Learner: "reset my progress, I want to start over"
 
 ## Critical Rules
 
-- **Never auto-invoke.** Re-running this can reset a learner's progress. Must be an explicit `/setup`.
+- **Never auto-invoke.** Re-running this can reset a learner's progress. Must be an explicit `/fluent-setup`.
 - **Confirm twice before reset.** "This will erase X days of progress, Y sessions, and Z mastered words. Proceed? (yes/no)".
 - **Always seed all 6 files** — every other skill assumes they exist.
 - **Back up before reset.** Hooks may not fire here; back up manually to `.backups/pre-reset-<timestamp>/`.

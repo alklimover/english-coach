@@ -66,29 +66,29 @@ You are an **interactive language tutor** that helps learners master any languag
 
 | Command | File | Purpose | Your Job |
 |---------|------|---------|----------|
-| `/setup` | `setup/SKILL.md` | Interactive onboarding | Collect learner info, create profile |
-| `/learn` | `learn/SKILL.md` | Main adaptive session | Mixed practice, adapt to performance |
-| `/review` | `review/SKILL.md` | Spaced repetition | Review items due today (SM-2) |
-| `/vocab` | `vocab/SKILL.md` | Vocabulary drills | Flashcard-style practice |
-| `/writing` | `writing/SKILL.md` | Writing practice | Emails, letters, essays |
-| `/speaking` | `speaking/SKILL.md` | Conversation practice | Typed dialogue |
-| `/reading` | `reading/SKILL.md` | Reading comprehension | Present text, ask questions |
-| `/progress` | `progress/SKILL.md` | Statistics dashboard | Auto-invokable — no gate |
+| `/fluent-setup` | `setup/SKILL.md` | Interactive onboarding | Collect learner info, create profile |
+| `/fluent-learn` | `learn/SKILL.md` | Main adaptive session | Mixed practice, adapt to performance |
+| `/fluent-review` | `review/SKILL.md` | Spaced repetition | Review items due today (SM-2) |
+| `/fluent-vocab` | `vocab/SKILL.md` | Vocabulary drills | Flashcard-style practice |
+| `/fluent-writing` | `writing/SKILL.md` | Writing practice | Emails, letters, essays |
+| `/fluent-speaking` | `speaking/SKILL.md` | Conversation practice | Typed dialogue |
+| `/fluent-reading` | `reading/SKILL.md` | Reading comprehension | Present text, ask questions |
+| `/fluent-progress` | `progress/SKILL.md` | Statistics dashboard | Auto-invokable — no gate |
 
 **Helper skills** (slash-invokable + auto-loaded by Claude when needed during a session):
 
 | Skill | Purpose |
 |-------|---------|
-| `sm2-calculator` | SM-2 algorithm reference |
-| `feedback-formatter` | Canonical feedback template + severity tagging |
-| `db-updater` | How to call `update-db.py` with a session report |
-| `session-analyzer` | How to parse `/results/*.md` to plan next session |
+| `fluent-sm2-calculator` | SM-2 algorithm reference |
+| `fluent-feedback-formatter` | Canonical feedback template + severity tagging |
+| `fluent-db-updater` | How to call `update-db.py` with a session report |
+| `fluent-session-analyzer` | How to parse `/results/*.md` to plan next session |
 
 **How skills work:**
-- User types `/learn` → Claude loads `.claude/skills/learn/SKILL.md`
+- User types `/fluent-learn` → Claude loads `.claude/skills/fluent-learn/SKILL.md`
 - Follow the protocol exactly
 - Helper skills referenced inline auto-load as needed
-- Update all databases at session end via the `db-updater` skill
+- Update all databases at session end via the `fluent-db-updater` skill
 
 ### 5. Session Results (`/results`)
 
@@ -230,10 +230,10 @@ You MUST implement these evidence-based methods:
 ### Step-by-Step Session Flow
 
 ```
-1. User runs: /learn
+1. User runs: /fluent-learn
 
 2. You read:
-   - .claude/skills/learn/SKILL.md (instructions)
+   - .claude/skills/fluent-learn/SKILL.md (instructions)
    - data/learner-profile.json (who)
    - data/spaced-repetition.json (what's due)
    - data/mistakes-db.json (weak areas)
@@ -411,7 +411,7 @@ From `CLAUDE.md`, your personality is:
 1. Read `CLAUDE.md` completely
 2. Read `LEARNING_SYSTEM.md` completely
 3. Understand data structure (read `AGENTS.md` - you're here!)
-4. Wait for user to run `/setup` or `/learn`
+4. Wait for user to run `/fluent-setup` or `/fluent-learn`
 5. Follow command instructions exactly
 6. Track everything in databases
 7. Be encouraging and fun!

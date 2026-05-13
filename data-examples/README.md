@@ -1,6 +1,6 @@
 # Data Examples Directory
 
-This directory contains **template files** showing the structure of the learning data that will be created in `/data` when you run `/setup`.
+This directory contains **template files** showing the structure of the learning data that will be created in `/data` when you run `/fluent-setup`.
 
 ## 📋 Template Files
 
@@ -17,7 +17,7 @@ This directory contains **template files** showing the structure of the learning
 
 **These templates are for reference only!**
 
-- ✅ **See the data structure** before running `/setup`
+- ✅ **See the data structure** before running `/fluent-setup`
 - ✅ **Understand what gets tracked** in each database
 - ✅ **For developers** who want to understand the schema
 - ✅ **For contributors** building integrations or tools
@@ -26,7 +26,7 @@ This directory contains **template files** showing the structure of the learning
 
 **Do NOT copy these to `/data`!**
 
-The `/setup` command will create the actual files with:
+The `/fluent-setup` command will create the actual files with:
 - ✅ Your real information (name, language, goals)
 - ✅ Initialized values (0s, empty arrays)
 - ✅ Today's date as creation date
@@ -64,7 +64,7 @@ Templates use placeholders:
 }
 ```
 
-**Actual file (after `/setup`):**
+**Actual file (after `/fluent-setup`):**
 ```json
 {
   "learner": {
@@ -83,12 +83,12 @@ Templates use placeholders:
 
 **Adding new fields:**
 1. Update the template file here
-2. Update the `/setup` command to populate it
+2. Update the `/fluent-setup` command to populate it
 3. Update AGENTS.md with the new structure
 4. Update LEARNING_SYSTEM.md if it affects teaching
 
 ---
 
-**Ready to create your actual data?** Run `/setup` to begin! 🚀
+**Ready to create your actual data?** Run `/fluent-setup` to begin! 🚀
 
 *Templates are for reference only. Your real data lives in `/data` (created automatically).*

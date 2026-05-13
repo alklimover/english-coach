@@ -1,6 +1,6 @@
 ---
-name: reading
-description: Run an interactive reading comprehension session with a short target-language text followed by main-idea, detail, vocabulary-in-context, inference, and true/false questions. Triggered only when the learner types /reading. Presents the text, waits for the learner to read, then asks questions one at a time with immediate feedback, and optionally adds new vocabulary to the spaced-repetition queue.
+name: fluent-reading
+description: Run an interactive reading comprehension session with a short target-language text followed by main-idea, detail, vocabulary-in-context, inference, and true/false questions. Triggered only when the learner types /fluent-reading. Presents the text, waits for the learner to read, then asks questions one at a time with immediate feedback, and optionally adds new vocabulary to the spaced-repetition queue.
 allowed-tools: Read, Write, Bash
 disable-model-invocation: true
 ---
@@ -13,9 +13,9 @@ Present one text (100-500 words depending on level), ask 4-6 comprehension quest
 
 ## When to Use
 
-Trigger this skill only when the learner types `/reading`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+Trigger this skill only when the learner types `/fluent-reading`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
 
-Skip this skill below A1 mastery 3 — shorter flashcard drills (`/vocab`) are more appropriate for very early learners.
+Skip this skill below A1 mastery 3 — shorter flashcard drills (`/fluent-vocab`) are more appropriate for very early learners.
 
 ## Instructions
 
@@ -194,15 +194,15 @@ If yes, stage each word for `new_vocabulary[]` in the end-of-session DB update.
 
 ### 9. Update all databases
 
-Use the `db-updater` skill:
+Use the `fluent-db-updater` skill:
 
-- `command_used: "/reading"`, `skills_practiced: ["reading"]`
+- `command_used: "/fluent-reading"`, `skills_practiced: ["reading"]`
 - `skill_scores.reading: {exercises: N, correct: count_right, time_minutes}`
 - `errors[]` — per question-type weakness (category `comprehension`, `vocabulary`, `inference`)
 - `new_vocabulary[]` — words the learner chose to save
 - `focus_next_session[]`
 
-Save to `/results/reading-session-{NNN}.md` — include the full text + Q&A for later analysis.
+Save to `/results/fluent-reading-session-{NNN}.md` — include the full text + Q&A for later analysis.
 
 ## Examples
 
@@ -256,7 +256,7 @@ Learner: "b"
 - **Ask questions in the target language** (at least from A2 up). Reading-comprehension checks should happen in the same language as the text.
 - **Quote the text** in explanations so the learner can trace the answer back to the source.
 - **Vocabulary opt-in.** Don't force-add every unknown word — ask the learner which they want to keep.
-- **Never auto-invoke.** Gated; must fire only on explicit `/reading`.
+- **Never auto-invoke.** Gated; must fire only on explicit `/fluent-reading`.
 
 ## Sample Text Bank (Dutch A2)
 

@@ -1,6 +1,6 @@
 ---
-name: db-updater
-description: Atomically update all 6 Fluent learner databases (learner-profile, progress, mistakes, mastery, spaced-repetition, session-log) at session end by calling .claude/hooks/update-db.py with a single JSON payload. Use at the end of every practice session — writing, vocab, speaking, reading, review, learn — to persist the session's errors, review results, new vocabulary, and session metadata.
+name: fluent-db-updater
+description: Atomically update all 6 Fluent learner databases (learner-profile, progress, mistakes, mastery, spaced-repetition, session-log) at session end by calling .claude/hooks/update-db.py with a single JSON payload. Use at the end of every practice session — fluent-writing, fluent-vocab, fluent-speaking, fluent-reading, fluent-review, fluent-learn — to persist the session's errors, review results, new vocabulary, and session metadata.
 ---
 
 # DB Updater
@@ -18,7 +18,7 @@ Load this skill whenever the tutor:
 - Needs to record new errors, review results, or mastery changes.
 - Needs to bump `total_sessions`, `current_streak_days`, or `total_study_minutes`.
 
-Skip this skill for read-only operations (use the `progress` skill or `read-db.py` directly) and during session setup (use `setup` skill instead — `update-db.py` is for session deltas, not bootstrap).
+Skip this skill for read-only operations (use the `fluent-progress` skill or `read-db.py` directly) and during session setup (use `fluent-setup` skill instead — `update-db.py` is for session deltas, not bootstrap).
 
 ## Instructions
 
@@ -53,7 +53,7 @@ Key blocks the example covers: `skill_scores`, `errors[]`, `new_vocabulary[]`, `
 
 - `errors[]` — one entry per distinct mistake this session. Collapse duplicates (same `pattern_id`) before sending; `frequency` is bumped by the script.
 - `new_vocabulary[]` — items the learner met for the first time. Fill every field; incomplete entries yield incomplete spaced-repetition records.
-- `review_results[]` — items already in the queue that were reviewed. The script runs SM-2 on each. See the `sm2-calculator` skill. Mapping: `quality = floor(score / 2)`.
+- `review_results[]` — items already in the queue that were reviewed. The script runs SM-2 on each. See the `fluent-sm2-calculator` skill. Mapping: `quality = floor(score / 2)`.
 - `skill_scores[].correct` counts correct exercises, not a percentage. Accuracy is derived.
 - `confidence` in `learner-profile.skills` is 0–100 integer; `accuracy` in `progress-db` is 0.0–1.0 float. The script handles the conversion.
 
@@ -69,7 +69,7 @@ Returns all 6 databases plus computed fields (`due_reviews_count`, `next_session
 
 ## Examples
 
-### Example 1 — /review session with 5 items
+### Example 1 — /fluent-review session with 5 items
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db.py" <<'EOF'
@@ -77,7 +77,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db
   "session_id": "session-012",
   "date": "2026-04-24",
   "duration_minutes": 12,
-  "command_used": "/review",
+  "command_used": "/fluent-review",
   "skills_practiced": ["vocabulary", "grammar"],
   "skill_scores": {
     "vocabulary": { "exercises": 3, "correct": 3, "time_minutes": 7 },
@@ -105,14 +105,14 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db
 EOF
 ```
 
-### Example 2 — /vocab session with a new word
+### Example 2 — /fluent-vocab session with a new word
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db.py" <<'EOF'
 {
   "session_id": "session-013",
   "date": "2026-04-25",
-  "command_used": "/vocab",
+  "command_used": "/fluent-vocab",
   "skills_practiced": ["vocabulary"],
   "new_vocabulary": [
     {

@@ -53,7 +53,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db
   "session_id": "session-005",
   "date": "2026-04-24",
   "duration_minutes": 20,
-  "command_used": "/learn",
+  "command_used": "/fluent-learn",
   "skills_practiced": ["vocabulary", "writing"],
   "skill_scores": {
     "vocabulary": { "exercises": 5, "correct": 4, "time_minutes": 10 },

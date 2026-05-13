@@ -4,7 +4,7 @@
   "session_id": "session-005",
   "date": "2026-04-24",
   "duration_minutes": 20,
-  "command_used": "/learn",
+  "command_used": "/fluent-learn",
   "skills_practiced": ["vocabulary", "writing"],
 
   "skill_scores": {
