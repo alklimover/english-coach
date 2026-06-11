@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Fluent — AI Language Learning Kit for Claude Code. Single-plugin marketplace hosting the fluent plugin.",
-    "version": "0.2.0"
+    "version": "0.2.1"
   },
   "plugins": [
     {
@@ -21,7 +21,7 @@
         "name": "Mohammad Kermani",
         "url": "https://github.com/m98"
       },
-      "version": "0.2.0",
+      "version": "0.2.1",
       "strict": true
     }
   ]

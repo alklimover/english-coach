@@ -2,6 +2,19 @@
 
 All notable changes to Fluent will be documented in this file.
 
+## [0.2.1] — 2026-06-11
+
+### Fixed
+
+- Hooks no longer fail on Windows with `No such file or directory` (#5).
+  Plugin hook commands in `hooks.json` used the bash default-value syntax
+  `${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}`, which Claude Code's own
+  variable substitution does not understand on Windows — it replaced the
+  variable names but left the `:-` separators literal, producing a single
+  garbage path. Hook commands now use plain `${CLAUDE_PLUGIN_ROOT}` (always
+  set for plugin hooks) and invoke scripts via an explicit `python3`/`bash`
+  interpreter so they don't depend on shebang handling under Git Bash.
+
 ## [0.2.0] — 2026-05-14
 
 ### Breaking changes
