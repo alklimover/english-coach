@@ -56,6 +56,7 @@ Key blocks the example covers: `skill_scores`, `errors[]`, `new_vocabulary[]`, `
 - `review_results[]` — items already in the queue that were reviewed. The script runs SM-2 on each. See the `fluent-sm2-calculator` skill. Mapping: `quality = floor(score / 2)`.
 - `skill_scores[].correct` counts correct exercises, not a percentage. Accuracy is derived.
 - `confidence` in `learner-profile.skills` is 0–100 integer; `accuracy` in `progress-db` is 0.0–1.0 float. The script handles the conversion.
+- `milestones[]` — each entry is a bare string OR an object `{ "milestone": <required non-empty string>, "date": <optional YYYY-MM-DD, defaults to the session date> }`. Don't set a nested `session_id`; the script stamps the authoritative top-level one. A malformed entry (neither string nor object, or an object missing/empty `milestone`) exits `1` with no files written. Each milestone becomes both a `session-log.milestones[]` record and a `learner-profile.achievements[]` entry.
 
 ### 4. Read before writing
 

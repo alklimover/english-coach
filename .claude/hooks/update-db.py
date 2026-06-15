@@ -71,6 +71,71 @@ def get_week_start(today_str: str) -> str:
     return date_str(monday)
 
 
+def normalize_milestones(session: dict) -> list:
+    """Validate + canonicalize session['milestones'] in place.
+
+    Accepts each entry as either a bare string or an object
+    {"milestone": <required non-empty str>, "date": <optional YYYY-MM-DD>}.
+    Returns a list of canonical dicts and rewrites session['milestones'] to it.
+
+    Decisions: a milestone's own date is honored (falling back to the session
+    date if missing/blank/unparseable); the authoritative top-level session_id
+    always wins (any nested session_id is ignored). Malformed entries exit 1
+    (validation error) before any DB is touched.
+
+    Each canonical dict carries a private '_achievement_id' key used by
+    update_learner_profile; it is harmless because `session` is never persisted
+    (only the 6 DBs are written).
+    """
+    raw = session.get("milestones", [])
+    if not raw:
+        session["milestones"] = []
+        return []
+    if not isinstance(raw, list):
+        print(f"[Fluent] Error: 'milestones' must be a list, got {type(raw).__name__}", file=sys.stderr)
+        sys.exit(1)
+
+    outer_date = session["date"]
+    outer_sid = session["session_id"]
+    normalized = []
+
+    for i, ms in enumerate(raw):
+        if isinstance(ms, str):
+            text = ms.strip()
+            if not text:
+                print(f"[Fluent] Error: milestone at index {i} is an empty string", file=sys.stderr)
+                sys.exit(1)
+            when = outer_date
+        elif isinstance(ms, dict):
+            text = ms.get("milestone")
+            if not isinstance(text, str) or not text.strip():
+                print(f"[Fluent] Error: milestone at index {i} must have a non-empty string 'milestone' field", file=sys.stderr)
+                sys.exit(1)
+            text = text.strip()
+            when = outer_date
+            d = ms.get("date")
+            if isinstance(d, str) and d.strip():
+                try:
+                    parse_date(d.strip())
+                    when = d.strip()
+                except (ValueError, TypeError):
+                    when = outer_date  # malformed date falls back to session date
+        else:
+            print(f"[Fluent] Error: milestone at index {i} must be a string or object, got {type(ms).__name__}", file=sys.stderr)
+            sys.exit(1)
+
+        slug = re.sub(r'[^a-z0-9]+', '_', text[:30].lower()).strip('_') or "milestone"
+        normalized.append({
+            "date": when,
+            "milestone": text,
+            "session_id": outer_sid,
+            "_achievement_id": f"session_{outer_sid}_{i}_{slug}",
+        })
+
+    session["milestones"] = normalized
+    return normalized
+
+
 def backup_all(tag: str):
     backup_path = BACKUP_DIR / tag
     backup_path.mkdir(parents=True, exist_ok=True)
@@ -150,13 +215,12 @@ def update_learner_profile(profile: dict, session: dict):
     if session.get("focus_areas"):
         profile["focus_areas"] = session["focus_areas"]
 
-    for ms in session.get("milestones", []):
-        slug = re.sub(r'[^a-z0-9]+', '_', ms[:30].lower()).strip('_')
+    for m in session.get("milestones", []):
         profile.setdefault("achievements", []).append({
-            "id": f"session_{session['session_id']}_{slug}",
-            "name": ms,
-            "earned_date": today,
-            "description": ms,
+            "id": m["_achievement_id"],
+            "name": m["milestone"],
+            "earned_date": m["date"],
+            "description": m["milestone"],
         })
 
 
@@ -453,11 +517,11 @@ def update_session_log(log: dict, session: dict, streak: int):
 
     log.setdefault("sessions", []).append(entry)
 
-    for ms in session.get("milestones", []):
+    for m in session.get("milestones", []):
         log.setdefault("milestones", []).append({
-            "date": today,
-            "milestone": ms,
-            "session_id": session["session_id"],
+            "date": m["date"],
+            "milestone": m["milestone"],
+            "session_id": m["session_id"],
         })
 
     log.setdefault("metadata", {})["total_sessions"] = len(log["sessions"])
@@ -476,6 +540,10 @@ def main():
         if field not in session:
             print(f"[Fluent] Error: Missing required field '{field}'", file=sys.stderr)
             sys.exit(1)
+
+    # Validate + canonicalize milestones before touching any DB (exits 1 on
+    # malformed input, so disk stays untouched on a validation failure).
+    normalize_milestones(session)
 
     session.setdefault("duration_minutes", 0)
 

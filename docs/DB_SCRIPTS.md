@@ -92,7 +92,10 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db
   "focus_next_session": ["Drill de/het article gender"],
   "session_notes": "Strong session. Article gender still tricky.",
   "achievements_earned": [],
-  "milestones": []
+  "milestones": [
+    { "milestone": "Reached 100 words learned", "date": "2026-04-24" },
+    "Completed first full conversation"
+  ]
 }
 EOF
 ```
@@ -128,3 +131,11 @@ Everything else is optional; omitted fields do not update.
   `mastery_level`, `total_reviews`, `priority`, `content`, `answer`,
   `category`, `difficulty` — supply these in `new_vocabulary` payloads so new
   items are fully populated.
+- `milestones[]` accepts **either** a bare string **or** an object
+  `{ "milestone": <required non-empty string>, "date": <optional YYYY-MM-DD,
+  defaults to the session date> }`. A nested `session_id` is ignored — the
+  script always stamps each milestone with the authoritative top-level
+  `session_id`. An entry that is neither a string nor an object, or an object
+  whose `milestone` is missing/empty/non-string, is a validation error (exit
+  `1`, no files written). A present-but-unparseable `date` silently falls back
+  to the session date.
