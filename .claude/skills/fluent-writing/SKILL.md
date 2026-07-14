@@ -46,7 +46,7 @@ If the learner already supplied the journal/text to check, skip steps 3–4 and 
 ```markdown
 ## ✍️ Writing Exercise
 
-**Scenario:** {clear description in native language}
+**Scenario:** {clear description in simple target-language English}
 
 **Task:** Write a {type} in {target_language}.
 

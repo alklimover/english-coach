@@ -368,6 +368,9 @@ class UpdateDbSmokeTest(unittest.TestCase):
         payload["session_id"] = "coach-intro-002"
         payload["profile_updates"] = {
             "current_level": "B2",
+            "target_level": "C1",
+            "daily_goal_minutes": 25,
+            "motivation": "  work presentations  ",
             "interests": ["product management", "AI"],
             "onboarding_completed": "2026-04-24",
             "focus_areas": ["articles", "spontaneous speaking"],
@@ -377,6 +380,9 @@ class UpdateDbSmokeTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, msg=proc.stderr)
         profile = self._load("learner-profile.json")
         self.assertEqual(profile["learner"]["current_level"], "B2")
+        self.assertEqual(profile["learner"]["target_level"], "C1")
+        self.assertEqual(profile["learner"]["daily_goal_minutes"], 25)
+        self.assertEqual(profile["learner"]["motivation"], "work presentations")
         self.assertEqual(profile["preferences"]["interests"],
                          ["product management", "AI"])
         self.assertEqual(profile["preferences"]["onboarding_completed"],
@@ -388,6 +394,11 @@ class UpdateDbSmokeTest(unittest.TestCase):
         bad_updates = [
             {"current_level": "B3"},
             {"current_level": "B1+"},
+            {"target_level": "B2+"},
+            {"daily_goal_minutes": True},
+            {"daily_goal_minutes": 4},
+            {"daily_goal_minutes": 241},
+            {"motivation": "   "},
             {"interests": "AI"},
             {"onboarding_completed": "24-04-2026"},
             {"unknown": True},

@@ -143,16 +143,19 @@ def normalize_profile_updates(session: dict) -> dict:
         print("[Fluent] Error: 'profile_updates' must be an object", file=sys.stderr)
         sys.exit(1)
 
-    allowed = {"current_level", "interests", "onboarding_completed", "focus_areas"}
+    allowed = {
+        "current_level", "target_level", "daily_goal_minutes", "motivation",
+        "interests", "onboarding_completed", "focus_areas",
+    }
     unknown = set(updates) - allowed
     if unknown:
         print(f"[Fluent] Error: unsupported profile_updates fields: {sorted(unknown)}", file=sys.stderr)
         sys.exit(1)
 
-    current_level = updates.get("current_level")
-    if current_level is not None:
-        if current_level not in {"A1", "A2", "B1", "B2", "C1", "C2"}:
-            print("[Fluent] Error: profile_updates.current_level must be a supported CEFR level", file=sys.stderr)
+    for field in ("current_level", "target_level"):
+        level = updates.get(field)
+        if level is not None and level not in {"A1", "A2", "B1", "B2", "C1", "C2"}:
+            print(f"[Fluent] Error: profile_updates.{field} must be a supported CEFR level", file=sys.stderr)
             sys.exit(1)
 
     for field in ("interests", "focus_areas"):
@@ -164,6 +167,21 @@ def normalize_profile_updates(session: dict) -> dict:
             print(f"[Fluent] Error: profile_updates.{field} must be a list of non-empty strings", file=sys.stderr)
             sys.exit(1)
 
+    daily_minutes = updates.get("daily_goal_minutes")
+    if daily_minutes is not None and (
+        isinstance(daily_minutes, bool)
+        or not isinstance(daily_minutes, int)
+        or not 5 <= daily_minutes <= 240
+    ):
+        print("[Fluent] Error: profile_updates.daily_goal_minutes must be an integer from 5 to 240", file=sys.stderr)
+        sys.exit(1)
+
+    motivation = updates.get("motivation")
+    if motivation is not None and (
+        not isinstance(motivation, str) or not motivation.strip()
+    ):
+        print("[Fluent] Error: profile_updates.motivation must be a non-empty string", file=sys.stderr)
+        sys.exit(1)
     completed = updates.get("onboarding_completed")
     if completed is not None:
         try:
@@ -176,6 +194,8 @@ def normalize_profile_updates(session: dict) -> dict:
     for field in ("interests", "focus_areas"):
         if field in normalized:
             normalized[field] = [item.strip() for item in normalized[field]]
+    if "motivation" in normalized:
+        normalized["motivation"] = normalized["motivation"].strip()
     session["profile_updates"] = normalized
     return normalized
 
@@ -262,6 +282,12 @@ def update_learner_profile(profile: dict, session: dict):
     profile_updates = session.get("profile_updates", {})
     if "current_level" in profile_updates:
         profile.setdefault("learner", {})["current_level"] = profile_updates["current_level"]
+    if "target_level" in profile_updates:
+        profile.setdefault("learner", {})["target_level"] = profile_updates["target_level"]
+    if "daily_goal_minutes" in profile_updates:
+        profile.setdefault("learner", {})["daily_goal_minutes"] = profile_updates["daily_goal_minutes"]
+    if "motivation" in profile_updates:
+        profile.setdefault("learner", {})["motivation"] = profile_updates["motivation"]
     if "interests" in profile_updates:
         profile.setdefault("preferences", {})["interests"] = profile_updates["interests"]
     if "onboarding_completed" in profile_updates:

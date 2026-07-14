@@ -39,7 +39,7 @@ class SessionStartZeroCommandTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             output = self._run_hook(Path(tmp))
 
-        self.assertIn("давайте настроим репетитора", output)
+        self.assertIn("Help me set up my English coach", output)
         self.assertNotIn("/fluent-", output)
         self.assertNotIn("/coach-", output)
 
@@ -54,7 +54,8 @@ class SessionStartZeroCommandTest(unittest.TestCase):
                         "target_language": "English",
                         "current_level": "B1",
                         "target_level": "B2",
-                    }
+                    },
+                    "preferences": {"onboarding_completed": "2026-07-14"},
                 },
             )
             self._write_json(
@@ -80,10 +81,43 @@ class SessionStartZeroCommandTest(unittest.TestCase):
             output = self._run_hook(data)
 
         self.assertIn("they will be included automatically", output)
-        self.assertIn('say "начинаем" to start', output)
+        self.assertIn('say "I\'m ready" to start', output)
         self.assertIn("reflect on the week", output)
         self.assertNotIn("/fluent-", output)
         self.assertNotIn("/coach-", output)
+
+    def test_incomplete_onboarding_prioritizes_english_placement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            self._write_json(
+                data / "learner-profile.json",
+                {
+                    "learner": {
+                        "name": "Learner",
+                        "target_language": "English",
+                        "current_level": "B1",
+                        "target_level": "C1",
+                    },
+                    "preferences": {},
+                },
+            )
+            self._write_json(
+                data / "weekly-plan.json",
+                {
+                    "activities": [{
+                        "day": datetime.now().strftime("%a").lower()[:3],
+                        "type": "listen",
+                        "status": "planned",
+                    }]
+                },
+            )
+
+            output = self._run_hook(data)
+
+        self.assertIn("speaking placement is not complete", output)
+        self.assertIn("Assess my English from the beginning", output)
+        self.assertNotIn("Today's plan", output)
+        self.assertNotIn("начинаем", output)
 
 
 if __name__ == "__main__":

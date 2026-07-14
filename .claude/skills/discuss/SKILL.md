@@ -33,7 +33,7 @@ Duration ~10–15 minutes or a stop phrase, as in `/talk`.
 
 ### 3. Review and persist
 
-Identical to the `/talk` review (four blocks, mistake explanations in Russian) plus one addition: **useful vocabulary from the material itself** — words/phrases the learner reached for or the material featured — goes to SRS as `item_type: "phrase"` with `category` = the material's topic.
+Identical to the `/talk` review (four blocks, mistake explanations in simple English) plus one addition: **useful vocabulary from the material itself** — words/phrases the learner reached for or the material featured — goes to SRS as `item_type: "phrase"` with `category` = the material's topic.
 
 Persist via `fluent-db-updater`: `command_used: "/discuss"`, `skills_practiced: ["speaking", "listening"]`. Transcript → `results/discuss-session-{NNN}.md`. Mark **both** the `listen` and the `discuss` activities `done` with `session_ref`.
 

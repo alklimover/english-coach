@@ -140,17 +140,16 @@ Call the `fluent-db-updater` skill's workflow — one `update-db.py` invocation 
 >
 > **Context:** "We're hiring two engineers this quarter."
 >
-> **What does it mean in Russian?**
+> **What does it mean? Explain it in simple English or give an example.**
 >
 > Type your answer:
 
-Learner: "нанимать"
+Learner: "It means to give someone a job."
 
 > ✅ Exactly.
 >
-> **Answer:** нанимать (брать на работу)
 > **Meaning:** To employ someone for a job.
-> **Example:** "We're hiring two engineers this quarter." (Мы нанимаем двух инженеров в этом квартале.)
+> **Example:** "We're hiring two engineers this quarter."
 >
 > **Score: 10/10** 🎯
 >
@@ -190,7 +189,7 @@ Learner: "to discuss about"
 - **One word at a time.** Wait for the learner's answer before showing the next.
 - **Immediate feedback** after each — use `fluent-feedback-formatter`.
 - **Mix modes.** Don't drill 20 recognition prompts in a row — interleave for discrimination.
-- **Use target language** for greetings + transitions when the learner is B1+; for A1-A2 mix target + native.
+- **Use the target language throughout.** For A1–A2, shorten prompts and use concrete examples instead of switching to the native language.
 - **Never** update the DBs mid-session — batch at end.
 - **Authorization boundary.** Start only from a confirmed vocabulary activity or clear request to practise words.
 

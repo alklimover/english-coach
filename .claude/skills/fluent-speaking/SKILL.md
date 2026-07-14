@@ -117,7 +117,7 @@ For B1+ or when the learner is warmed up:
 ```markdown
 ## 🎭 Role-Play
 
-**Scenario:** {description in native language}
+**Scenario:** {clear description in simple target-language English}
 **Your role:** {what the learner plays}
 **I'll be:** {what Claude plays}
 
@@ -213,7 +213,7 @@ Learner: "I am {LEARNER_NAME}. I am founder of small company, we build software 
 
 - **Communication first.** A clear message with a missed article scores better than a grammatically perfect but confusing answer.
 - **One question at a time.** Wait for reply before next.
-- **Stay in the target language** for questions and transitions. Drop to native only for explanations.
+- **Stay in the target language** for questions, transitions, and explanations. If comprehension fails, shorten, paraphrase, and give a concrete target-language example.
 - **Praise natural expression.** If the learner uses "Well..." or "Actually..." correctly, call it out — those are fluency markers.
 - **Don't over-correct.** A speaking session with 20 red marks kills confidence.
 - **Authorization boundary.** Start only when the learner clearly requests text-only conversation; ordinary talk intent is voice-first.

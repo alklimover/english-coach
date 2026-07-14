@@ -79,7 +79,7 @@ Hard rules — these define the product:
 
 Exactly four blocks. Write the review to be **instantly clear**: short lines, concrete examples, no linguistics jargon.
 
-1. **Top-3 mistakes** — only real ones: communication-blocking or matching a repeating/watch pattern. Each as three lines: what you said → the natural version → **one-line explanation in Russian** (the learner's native language — this is exactly the "critical understanding" case). Fewer than 3 real mistakes? Show fewer; don't pad.
+1. **Top-3 mistakes** — only real ones: communication-blocking or matching a repeating/watch pattern. Each as three lines: what you said → the natural version → **one short explanation in simple English**. If it is unclear, paraphrase or give an English example; never translate. Fewer than 3 real mistakes? Show fewer; don't pad.
 2. **5 useful phrases** — natural alternatives to things the learner said awkwardly, or strong phrases they should keep. These go to the SRS queue.
 3. **One focus** for the next session (a single pattern or scenario move, not a list).
 4. **Score** — communication-first, per the fluent speaking scheme (communication / grammar / vocabulary), feeding mastery for `speaking`.

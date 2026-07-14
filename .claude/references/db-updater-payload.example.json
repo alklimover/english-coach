@@ -9,6 +9,9 @@
 
   "profile_updates": {
     "current_level": "B1",
+    "target_level": "C1",
+    "daily_goal_minutes": 20,
+    "motivation": "work communication",
     "interests": ["product management", "AI", "business communication"],
     "onboarding_completed": "2026-04-24",
     "focus_areas": ["articles", "spontaneous speaking"]

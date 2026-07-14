@@ -76,7 +76,7 @@ Use the `AskUserQuestion` tool to gather questions in batches when possible. Req
 
 1. **Name** — personalizes greetings.
 2. **Target language** — the language being learned (e.g. Spanish, French, German, Japanese, Korean, Arabic, Dutch).
-3. **Native language** — for translations and explanations.
+3. **Native language** — used only to anticipate transfer patterns; learner-facing explanations remain in the target language.
 4. **Other languages spoken** — optional, used to offer cross-language connections.
 5. **Current level** — A1 / A2 / B1 / B2 / C1 / C2 / "not sure".
 6. **Target level** — where they want to get to.
@@ -161,7 +161,7 @@ Use the Write tool for each. Do not call `update-db.py` — that script is for s
 
 After all six databases exist, offer one natural next step:
 
-> «Профиль готов. Проведём короткую голосовую диагностику, чтобы проверить уровень и точнее собрать план?»
+> “Your profile is ready. Would you like a short speaking assessment so I can check your level and build a better plan?”
 
 On natural agreement, internally run `coach-intro`. It explains the process, performs the announced speaking ladder, persists the CEFR verdict and interests through `fluent-db-updater`, then builds the week. Do not run `fluent-learn` first and do not require the learner to know a skill or command name.
 

@@ -4,6 +4,31 @@ All notable changes are documented in this file. Entries tagged `-ec` are
 specific to the **english-coach** fork; upstream *fluent* releases are kept
 below them for reference.
 
+## [0.3.0-ec.4] — 2026-07-14
+
+### Added
+
+- First-contact startup prioritizes an unfinished voice placement over the daily
+  plan and gives a direct English reassessment prompt.
+- `profile_updates` can persist a complete onboarding refresh: current and
+  target CEFR levels, daily minutes, motivation, interests, focus areas, and
+  completion date, with validation before database writes.
+
+### Changed
+
+- All learner-facing communication is English-only, even when intent arrives in
+  Russian. Comprehension recovery now shortens, paraphrases, and demonstrates in
+  English instead of translating.
+- Explicit requests to reassess or “start from scratch” diagnostically re-run
+  `coach-intro` without deleting session history.
+- Voice onboarding explains the system, conducts the level ladder, presents the
+  verdict, and refreshes goals entirely in spoken English.
+
+### Fixed
+
+- Vague first-contact intent such as «не знаю, с чего начать» no longer falls
+  through to `coach-today` while onboarding is incomplete.
+
 ## [0.3.0-ec.3] — 2026-07-14
 
 ### Added

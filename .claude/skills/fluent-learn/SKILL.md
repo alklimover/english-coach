@@ -98,7 +98,7 @@ elif mastery_level >= 4:
 
 ### 7. Exercise types by skill
 
-**Writing**: sentence completion, translation, error correction, full email, reordering.
+**Writing**: sentence completion, paraphrasing, error correction, full email, reordering.
 
 **Speaking**: personal Qs, picture description, role-play, phonetic typing.
 

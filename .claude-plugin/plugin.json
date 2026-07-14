@@ -1,7 +1,7 @@
 {
   "name": "english-coach",
-  "version": "0.3.0-ec.3",
-  "description": "English Coach — a zero-command, voice-first English tutor. It builds a weekly program, starts activities from natural Russian or English intent, remembers sessions across 6 local databases, schedules spaced review, and supports daily or weekly written reflections.",
+  "version": "0.3.0-ec.4",
+  "description": "English Coach — a zero-command, voice-first English tutor. It accepts natural Russian or English intent while keeping all coaching in English, builds a weekly program, remembers sessions across 6 local databases, schedules spaced review, and supports daily or weekly written reflections.",
   "author": {
     "name": "Mohammad Kermani",
     "url": "https://github.com/m98"

@@ -57,6 +57,9 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db
   "skills_practiced": ["vocabulary", "writing"],
   "profile_updates": {
     "current_level": "B1",
+    "target_level": "C1",
+    "daily_goal_minutes": 20,
+    "motivation": "work communication",
     "interests": ["product management", "AI"],
     "onboarding_completed": "2026-04-24",
     "focus_areas": ["articles", "spontaneous speaking"]
@@ -137,7 +140,7 @@ Everything else is optional; omitted fields do not update.
   `mastery_level`, `total_reviews`, `priority`, `content`, `answer`,
   `category`, `difficulty` — supply these in `new_vocabulary` payloads so new
   items are fully populated.
-- `profile_updates` optionally refines onboarding metadata in `learner-profile.json`: standard CEFR `current_level` (`A1`, `A2`, `B1`, `B2`, `C1`, `C2`), string arrays `interests` and `focus_areas`, and `onboarding_completed` as `YYYY-MM-DD`. Unknown or malformed fields are rejected before writes.
+- `profile_updates` optionally refines onboarding metadata in `learner-profile.json`: standard CEFR `current_level` and `target_level` (`A1`, `A2`, `B1`, `B2`, `C1`, `C2`), `daily_goal_minutes` (integer 5–240), non-empty `motivation`, string arrays `interests` and `focus_areas`, and `onboarding_completed` as `YYYY-MM-DD`. Unknown or malformed fields are rejected before writes.
 - `milestones[]` accepts **either** a bare string **or** an object
   `{ "milestone": <required non-empty string>, "date": <optional YYYY-MM-DD,
   defaults to the session date> }`. A nested `session_id` is ignored — the

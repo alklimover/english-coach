@@ -25,8 +25,8 @@ def main():
     profile_path = data / "learner-profile.json"
 
     if not profile_path.exists():
-        print("[Fluent] 🌍 Welcome to Fluent - The AI Language Learning Kit!")
-        print('[Fluent] 📝 Say "давайте настроим репетитора" to create your learning profile')
+        print("[Fluent] Welcome to English Coach.")
+        print('[Fluent] Say "Help me set up my English coach" to create your learning profile.')
         sys.exit(0)
 
     try:
@@ -34,16 +34,21 @@ def main():
             profile = json.load(f)
 
         learner = profile.get("learner", {})
+        preferences = profile.get("preferences", {})
         name = learner.get("name", "Learner")
         target_lang = learner.get("target_language", "your target language")
-        current_level = learner.get("current_level", "...")
+        current_level = learner.get("current_level") or "not assessed"
         target_level = learner.get("target_level", "...")
         streak = profile.get("current_streak_days", 0)
 
-        print(f"[Fluent] 🌍 Welcome back, {name}!")
-        print(f"[Fluent] 📚 Learning: {target_lang}")
-        print(f"[Fluent] 🎯 Level: {current_level} → {target_level}")
-        print(f"[Fluent] 🔥 Streak: {streak} days")
+        print(f"[Fluent] Welcome back, {name}.")
+        print(f"[Fluent] Learning: {target_lang}")
+        if not preferences.get("onboarding_completed"):
+            print("[Coach] Your speaking placement is not complete yet.")
+            print('[Coach] Say "Assess my English from the beginning" to start the introduction.')
+            sys.exit(0)
+        print(f"[Fluent] Level: {current_level} → {target_level}")
+        print(f"[Fluent] Streak: {streak} days")
 
         sr_path = data / "spaced-repetition.json"
         if sr_path.exists():
@@ -101,7 +106,7 @@ def main():
                              or (a.get("source") or {}).get("title")
                              or a.get("about") or "")
                     extra = f" — {label}" if label else ""
-                    print(f"[Coach] 📅 Today's plan: {a.get('type')}{extra} — say \"начинаем\" to start")
+                    print(f"[Coach] Today's plan: {a.get('type')}{extra} — say \"I'm ready\" to start")
     except Exception:
         pass
 

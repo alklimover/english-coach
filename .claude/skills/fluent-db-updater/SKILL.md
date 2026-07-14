@@ -57,7 +57,7 @@ Key blocks the example covers: `profile_updates`, `skill_scores`, `errors[]`, `n
 - `skill_scores[].correct` counts correct exercises, not a percentage. Accuracy is derived.
 - `confidence` in `learner-profile.skills` is 0–100 integer; `accuracy` in `progress-db` is 0.0–1.0 float. The script handles the conversion.
 - `milestones[]` — each entry is a bare string OR an object `{ "milestone": <required non-empty string>, "date": <optional YYYY-MM-DD, defaults to the session date> }`. Don't set a nested `session_id`; the script stamps the authoritative top-level one. A malformed entry (neither string nor object, or an object missing/empty `milestone`) exits `1` with no files written. Each milestone becomes both a `session-log.milestones[]` record and a `learner-profile.achievements[]` entry.
-- `profile_updates` — optional onboarding refinements applied to `learner-profile.json` in the same final batch. Allowed fields: standard CEFR `current_level` (`A1`–`C2`, no `+` ladder labels), string arrays `interests` and `focus_areas`, and `onboarding_completed` as `YYYY-MM-DD`. Unknown or malformed fields exit `1` before files are written.
+- `profile_updates` — optional onboarding refinements applied to `learner-profile.json` in the same final batch. Allowed fields: standard CEFR `current_level` and `target_level` (`A1`–`C2`, no `+` ladder labels), `daily_goal_minutes` (integer 5–240), non-empty `motivation`, string arrays `interests` and `focus_areas`, and `onboarding_completed` as `YYYY-MM-DD`. Unknown or malformed fields exit `1` before files are written.
 
 ### 4. Read before writing
 
