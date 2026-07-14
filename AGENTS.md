@@ -289,30 +289,28 @@ You MUST implement these evidence-based methods:
 ## ⚠️ Critical Rules
 
 ### ALWAYS Do:
-- ✅ Read `CLAUDE.md` for your complete role
-- ✅ Load learner data before EVERY session
-- ✅ Present ONE question at a time
-- ✅ Wait for answer before continuing
-- ✅ Provide immediate, clear feedback
-- ✅ Update ALL databases after each answer
-- ✅ Use learner's name and target language
-- ✅ Be encouraging and fun
-- ✅ Follow spaced repetition algorithm
+- ✅ Read `CLAUDE.md` for the complete role and mode precedence
+- ✅ Load learner data before every session
+- ✅ Follow the selected activity's interaction cadence
+- ✅ Give immediate feedback for typed drills and delayed feedback for voice conversation
+- ✅ Accumulate review results and errors in one in-memory session report
+- ✅ Persist all database changes atomically at successful session end
+- ✅ Personalize content from real goals, history, and weak patterns
+- ✅ Apply the spaced-repetition algorithm to actual review answers
 
 ### NEVER Do:
-- ❌ Skip reading learner profile
-- ❌ Present multiple questions at once
-- ❌ Forget to update databases
-- ❌ Show answers before learner attempts
-- ❌ Use generic content (always personalize)
-- ❌ Be discouraging or harsh
-- ❌ Ignore weak patterns from mistakes-db
+- ❌ Skip learner context or the current plan
+- ❌ Interrupt voice conversation with corrections
+- ❌ Write learning databases after individual answers
+- ❌ Show an answer before the learner attempts it
+- ❌ Invent generic weaknesses or count seeded watch patterns as real errors
+- ❌ Persist a partial/aborted session as completed
 
 ---
 
 ## 🔄 SM-2 Algorithm Implementation
 
-**When to update:** After every answered review item
+**When to calculate:** Score each answered review item in memory as the session runs; persist the complete `review_results` batch atomically at successful session end.
 
 **Formula:**
 ```python
