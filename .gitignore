@@ -1,7 +1,8 @@
 # Personal learning data - DO NOT commit
-/data/*.json
-/data/*.json.backup-*
-/results/*.md
+# Catch-all: everything in data/ and results/ is private by default,
+# whatever the file type (json, md, audio, backups...).
+/data/*
+/results/*
 # Except the README files which explain the structure
 !/data/README.md
 !/results/README.md
@@ -40,3 +41,7 @@ npm-debug.log*
 temp/
 *.json.tmp
 
+
+# Local TTS runtime (Kokoro) - never commit
+.tts-venv/
+.env*

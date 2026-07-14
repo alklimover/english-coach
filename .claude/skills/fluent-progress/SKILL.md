@@ -68,6 +68,22 @@ Use this exact structure. Fill in values from the databases; compute percentages
 
 ---
 
+## 🗣️ North-Star: Speaking
+
+> The one metric that matters: **speaking minutes per week**. Not total study
+> time, not accuracy — time spent actually talking. Lead the dashboard with it.
+
+**Speaking this week:** {computed.speaking_minutes_this_week} min
+**Speaking streak:** 🔥 {computed.speaking_streak_days} {day_or_days}
+**This month's sessions:** {count of /talk + /discuss sessions this month}
+
+Both values come straight from `read-db.py` → `computed`
+(`speaking_minutes_this_week`, `speaking_streak_days`) — do not recompute.
+Target cadence: **≥3 speaking sessions/week**; call it out if the learner is
+on track or behind, in a neutral tone (a slow week is data, not failure).
+
+---
+
 ## 💪 Skills Mastery
 
 ### Writing ✍️

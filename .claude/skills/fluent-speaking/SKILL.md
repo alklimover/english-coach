@@ -169,26 +169,25 @@ Save exchange to `/results/fluent-speaking-session-{NNN}.md`.
 
 ## Examples
 
-### Example 1 — personal intro (Dutch A2)
+### Example 1 — personal intro (English)
 
 > ## Question 1: Introductions
 >
-> Vertel me over jezelf. Waar kom je vandaan?
-> (Tell me about yourself. Where are you from?)
+> Tell me about yourself. What do you do for work?
 
-Learner: "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
+Learner: "I am {LEARNER_NAME}. I am founder of small company, we build software products."
 
 > ✅ Clear and natural!
 >
-> **What you said:** "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
+> **What you said:** "I am {LEARNER_NAME}. I am founder of small company, we build software products."
 >
 > **Communication:** Clear ✅
 >
 > **Grammar notes:**
-> - 🟢 "van Iran" → **"uit Iran"** (prepositions — origin uses `uit`, not `van`). Small slip; message still crystal clear.
+> - 🟢 "founder of small company" → **"the founder of a small company"** (articles — English needs them even where Russian has none). Small slip; message still crystal clear.
 >
 > **Natural alternative:**
-> "Ik kom uit Iran, maar ik woon al een paar jaar in Nederland."
+> "I'm {LEARNER_NAME} — I run a small company where we build software products."
 >
 > **Score: 9/10**
 > - Communication: 5/5
@@ -197,17 +196,17 @@ Learner: "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
 >
 > Great start — you packed two ideas into one sentence, which is exactly what fluency looks like.
 
-### Example 2 — role-play opener (café scenario)
+### Example 2 — role-play opener (status call scenario)
 
 > ## 🎭 Role-Play
 >
-> **Scenario:** You're at a café in Amsterdam. You want coffee and a vegetarian option for lunch.
-> **Your role:** Customer
-> **I'll be:** The server
+> **Scenario:** You're on a status call with a client. You need to explain a delay and propose a new timeline.
+> **Your role:** Project lead
+> **I'll be:** The client
 >
 > ---
 >
-> *"Goedemiddag! Wat wilt u drinken?"*
+> *"Hi! Thanks for jumping on. So — where are we with the delivery?"*
 >
 > **Your turn:**
 
@@ -216,19 +215,20 @@ Learner: "Ik ben Mohammad. Ik kom van Iran maar ik woon nu in Nederland."
 - **Communication first.** A clear message with a missed article scores better than a grammatically perfect but confusing answer.
 - **One question at a time.** Wait for reply before next.
 - **Stay in the target language** for questions and transitions. Drop to native only for explanations.
-- **Praise natural expression.** If the learner uses "Nou..." or "Eh..." correctly, call it out — those are fluency markers.
+- **Praise natural expression.** If the learner uses "Well..." or "Actually..." correctly, call it out — those are fluency markers.
 - **Don't over-correct.** A speaking session with 20 red marks kills confidence.
 - **Never auto-invoke.** Gated; must fire only on explicit `/fluent-speaking`.
 
 ## Language Reference
 
-### Dutch A2 conversational fillers
+### English conversational fillers
 
-- "Nou..." (well / so)
-- "Eh..." (uh / um)
-- "Eigenlijk..." (actually)
-- "Dus..." (so / therefore)
-- "Ja, dat klopt" (yes, that's right)
-- "Ik snap het niet" (I don't understand)
+- "Well..." (buying time to think)
+- "Actually..." (correcting or adding nuance)
+- "To be fair..." (balancing a point)
+- "That makes sense." (acknowledging)
+- "Sort of / kind of" (hedging)
+- "Let me think..." (pausing naturally)
+- "Right, got it." (confirming)
 
 Add equivalents for other target languages as needed.

@@ -1,4 +1,6 @@
 {
+  "model": "sonnet",
+  "alwaysThinkingEnabled": false,
   "hooks": {
     "PostToolUse": [
       {

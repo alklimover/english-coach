@@ -59,8 +59,16 @@
   "preferences": {
     "difficulty_preference": "adaptive",
     "exercise_types_preferred": ["conversation", "writing", "quick_drills"],
-    "feedback_style": "immediate_with_explanation",
+    "feedback_style": "delayed_after_conversation",
     "gamification_enabled": true,
-    "use_emojis": true
+    "use_emojis": false,
+    "voice": {
+      "tts_enabled": true,
+      "engine": "kokoro",
+      "kokoro_voice": "af_heart",
+      "tts_voice": "Samantha",
+      "tts_rate": 175,
+      "input": "handy"
+    }
   }
 }

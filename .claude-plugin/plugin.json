@@ -1,13 +1,13 @@
 {
-  "name": "fluent",
-  "version": "0.3.0",
-  "description": "Fluent — AI Language Learning Kit. Personal AI tutor for any target language. Uses spaced repetition (SM-2), active recall, adaptive difficulty, and tracking across 6 databases. Daily practice: /fluent-review, /fluent-vocab, /fluent-writing, /fluent-speaking, /fluent-reading, /fluent-learn. Start with /fluent-setup.",
+  "name": "english-coach",
+  "version": "0.3.0-ec.2",
+  "description": "English Coach — voice-first English trainer, a fork of Fluent (AI Language Learning Kit). Fluent core: spaced repetition (SM-2), active recall, adaptive difficulty, tracking across 6 databases. Adds a voice conversation loop (/talk) and a weekly coaching program. Daily practice: /talk, /fluent-review, /fluent-vocab, /fluent-writing, /fluent-reading. Start with /fluent-setup.",
   "author": {
     "name": "Mohammad Kermani",
     "url": "https://github.com/m98"
   },
-  "homepage": "https://github.com/m98/fluent",
-  "repository": "https://github.com/m98/fluent",
+  "homepage": "https://github.com/alklimover/english-coach",
+  "repository": "https://github.com/alklimover/english-coach",
   "license": "MIT",
   "keywords": [
     "language-learning",
@@ -16,13 +16,9 @@
     "sm2",
     "tutor",
     "flashcards",
-    "dutch",
-    "spanish",
-    "french",
-    "german",
-    "japanese",
-    "korean",
-    "arabic"
+    "english",
+    "voice-first",
+    "speaking"
   ],
   "skills": "./.claude/skills/",
   "hooks": "./.claude/hooks/hooks.json"

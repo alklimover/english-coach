@@ -70,6 +70,41 @@ def main():
     except Exception as e:
         print(f"[Fluent] Error loading profile: {e}", file=sys.stderr)
 
+    # english-coach north-star metric: speaking minutes this week + speaking streak.
+    # Reuses the single source of truth from read-db.py (hyphenated → importlib).
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "fluent_read_db", Path(__file__).resolve().parent / "read-db.py")
+        rdb = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rdb)
+        log_path = data / "session-log.json"
+        if log_path.exists():
+            with open(log_path, "r") as f:
+                sessions = json.load(f).get("sessions", [])
+            mins, sstreak = rdb.speaking_stats(sessions, datetime.now())
+            unit = "day" if sstreak == 1 else "days"
+            print(f"[Coach] 🗣️  Speaking this week: {mins} min · speaking streak: {sstreak} {unit}")
+    except Exception:
+        pass
+
+    # english-coach coach layer: show today's planned activity (additive)
+    try:
+        plan_path = data / "weekly-plan.json"
+        if plan_path.exists():
+            with open(plan_path, "r") as f:
+                plan = json.load(f)
+            day = datetime.now().strftime("%a").lower()[:3]
+            for a in plan.get("activities", []):
+                if a.get("day") == day and a.get("status") == "planned":
+                    label = (a.get("scenario") or a.get("topic")
+                             or (a.get("source") or {}).get("title")
+                             or a.get("about") or "")
+                    extra = f" — {label}" if label else ""
+                    print(f"[Coach] 📅 Today's plan: {a.get('type')}{extra} — run /coach-today to start")
+    except Exception:
+        pass
+
     sys.exit(0)
 
 

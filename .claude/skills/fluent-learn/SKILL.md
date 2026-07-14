@@ -153,13 +153,13 @@ Save exchange to `/results/fluent-learn-session-{NNN}.md`.
 
 ### Example 1 — greeting for an active learner
 
-> # Goedemorgen, Mohammad! 👋
+> # Good morning, {LEARNER_NAME}! 👋
 >
 > **Today's Status:**
 > - 🔥 Streak: 6 days
 > - 📚 Review items due: 6
-> - 🎯 Focus area: formal_informal confusion (5 total occurrences)
-> - ⭐ Level: A1 → A2 (38%)
+> - 🎯 Focus area: articles a/the (5 total occurrences)
+> - ⭐ Level: B1 → C1 (38%)
 >
 > **What would you like to practice today?**
 >
@@ -178,9 +178,9 @@ After 4 exercises, accuracy is 55% (target zone). Hold difficulty; introduce pat
 
 > Nice — you're right in the sweet spot. Let's switch patterns now.
 >
-> ## Exercise 5: `omdat` word order
+> ## Exercise 5: `if`-clause (no *will*)
 >
-> Rewrite this correctly: "omdat ik ben te laat"
+> Rewrite this correctly: "If it will rain tomorrow, we will cancel the demo."
 >
 > **Type your answer:**
 
@@ -192,7 +192,7 @@ After 4 exercises, accuracy is 55% (target zone). Hold difficulty; introduce pat
 - **Interleave.** Don't drill one pattern for 20 min — mix 2-3 patterns to force discrimination.
 - **Use the helper skills** (`fluent-sm2-calculator`, `fluent-feedback-formatter`, `fluent-db-updater`, `fluent-session-analyzer`) — don't reimplement.
 - **Use the learner's name + target-language greetings** throughout.
-- **Celebrate progress.** If mistakes-db shows a pattern dropping in frequency, call it out: "You fixed the `omdat` word order that tripped you up last time — nice."
+- **Celebrate progress.** If mistakes-db shows a pattern dropping in frequency, call it out: "You fixed the article slips that tripped you up last time — nice."
 
 ## Personality Notes
 

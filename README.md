@@ -1,3 +1,9 @@
+# 🎙️ English Coach
+
+> **This is a fork of [m98/fluent](https://github.com/m98/fluent)** tuned for one thing: learning **English** through **voice-first practice** on a **weekly coaching program**. On top of the fluent core (6 tracking databases, SM-2 spaced repetition, 12 skills) it adds a voice conversation loop (`/talk` — dictated input, spoken output) and a coach layer that plans and drives your week. Run it as a project folder, not a plugin install. Your learning databases, transcripts, and voice synthesis stay local and out of git. Upstream credit: [Mohammad Kermani](https://github.com/m98).
+
+---
+
 # 🌍 Fluent
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Powered%20by-Claude%20Code-blue)](https://code.claude.com)
@@ -14,73 +20,84 @@ https://github.com/user-attachments/assets/66d68aad-210a-452d-b405-b58c13f42f53
 
 ## 🚀 Quick Start
 
-### 1. Install
+### 1. Clone the project folder
 
 ```bash
-claude plugin marketplace add m98/fluent && claude plugin install fluent@m98
+git clone https://github.com/alklimover/english-coach.git
+cd english-coach
 ```
 
-One line. Registers the marketplace, installs the plugin. Works globally from any directory after this.
+Run everything from inside this folder. English Coach is designed as a project-folder experience, not a marketplace plugin.
 
-### 2. Start learning
+### 2. Launch Claude Code
 
-Restart Claude Code, then:
-
-```
-/fluent-setup     # onboard: name, target language, level, goals
-/fluent-learn     # begin your first session
+```bash
+claude
 ```
 
-That's it.
+### 3. Onboard and start talking
+
+```
+/coach-intro     # first contact: level placement and weekly plan
+/talk            # live voice conversation
+```
 
 ---
 
 ### Requirements
 
 - [Claude Code](https://code.claude.com) installed
-- **Python 3.8+** (most systems already have it — check with `python3 --version`). Install via [python.org](https://www.python.org/downloads/), `brew install python3`, or your distro's package manager. No pip packages needed — Fluent uses only the standard library.
-- **Bash** for the PreCompact backup hook (built-in on macOS/Linux; on Windows use WSL or Git Bash).
+- **Python 3.8+** (`python3 --version`). Install via [python.org](https://python.org/downloads/), `brew install python3`, or your distro's package manager.
+- **Bash** for hooks and voice scripts (built-in on macOS/Linux; on Windows use WSL or Git Bash).
+- **macOS** is the supported spoken-output target; Kokoro is optimized for Apple Silicon and `say` is the built-in fallback.
 
-### Verify, update, uninstall
-
-```bash
-claude plugin list                    # expect: fluent@m98  enabled
-claude plugin update fluent@m98       # pull latest version
-claude plugin uninstall fluent@m98    # remove entirely
-```
-
-### Alternative: git clone
-
-Prefer to hack on the skills or keep per-project state?
+### Verify your setup
 
 ```bash
-git clone https://github.com/m98/fluent.git
-cd fluent
-claude          # launch from repo root
-/fluent-setup
+python3 -c "import sys; sys.path.insert(0, '.claude/hooks'); from fluent_paths import data_dir; print(data_dir())"
+bash -n bin/tts.sh
+python3 -m py_compile .claude/hooks/read-db.py .claude/hooks/session-start.py
+python3 -m json.tool data-examples/learner-profile-template.json >/dev/null && echo "profile template OK"
 ```
 
-Learner data lives in `./data/` inside the cloned repo instead of `~/.claude/fluent-data/`.
+### Voice setup (Handy → Claude → Kokoro/say)
+
+`/talk` uses Handy dictation for input, your existing Claude Code subscription for the conversation, and local speech synthesis for replies. No paid voice API is required.
+
+#### Kokoro neural voice (recommended stable path)
+
+```bash
+python3 -m venv .tts-venv
+.tts-venv/bin/pip install "mlx-audio==0.4.4" "transformers<5.13"
+```
+
+Set these under `preferences.voice` in `data/learner-profile.json`:
+
+```json
+{
+  "engine": "kokoro",
+  "kokoro_voice": "af_heart"
+}
+```
+
+If Kokoro cannot synthesize a reply, `bin/tts.sh` automatically uses the built-in macOS `say` voice. Set `preferences.voice.engine` to `say` to bypass Kokoro. Practice never blocks on TTS.
+
+#### ChatGPT Voice subscription
+
+ChatGPT Voice is more natural and full-duplex inside the ChatGPT app, but a ChatGPT subscription does **not** expose a supported API for this project. It remains a separate manual practice surface; copy its transcript back into English Coach if you want the local review and progress databases updated.
 
 ### Where your data lives
 
-Fluent resolves the data directory in this order — first match wins:
+English Coach resolves the data directory in this order — first match wins:
 
 1. `$FLUENT_DATA_DIR` if set (override everything).
-2. `$CLAUDE_PROJECT_DIR/data/` if it has `learner-profile.json` (clone mode, running from outside the repo root).
-3. `./data/` if it has `learner-profile.json` (clone mode, running inside the repo).
-4. `~/.claude/fluent-data/` (plugin-install default).
+2. `$CLAUDE_PROJECT_DIR/data/` if it has `learner-profile.json`.
+3. `./data/` if it has `learner-profile.json`.
 
 Set `FLUENT_DATA_DIR` to run multiple learners on one machine:
 
 ```bash
-export FLUENT_DATA_DIR=~/.fluent/dutch
-```
-
-Check where Fluent is currently looking:
-
-```bash
-python3 -c "import sys; sys.path.insert(0, '.claude/hooks'); from fluent_paths import data_dir; print(data_dir())"
+export FLUENT_DATA_DIR=~/.english-coach/learner-name
 ```
 
 ---
@@ -107,7 +124,7 @@ Most language learning apps fail because they're built for engagement metrics, n
 - 📊 **Tracks everything** - Every answer, every mistake, every improvement
 - 🔄 **Learns about YOU** - Knows your weak patterns and strengths
 - 📈 **Adapts to YOU** - Adjusts difficulty based on your performance
-- 🔒 **Private** - All data stays on your machine, no external tracking
+- 🔒 **Private by default** - Kokoro and `say` synthesize replies on this Mac. Learner records and transcripts stay local; dictation privacy depends on your Handy configuration.
 - 🎯 **Personal** - Like having a tutor who knows your exact level and learning style
 
 **The Result?** A learning system that feels like a conversation with an expert friend who remembers everything, tracks your progress scientifically, and makes learning actually enjoyable.
@@ -271,7 +288,7 @@ These skills don't change what the learner-facing commands do — they let Claud
 
 **📋 Want to see the structure?** Check `/data-examples/` for template files showing the complete schema.
 
-**🔒 Privacy:** All data stays on your machine. Automatically excluded from git via `.gitignore`.
+**🔒 Privacy:** Learner databases, transcripts, and speech synthesis stay on this machine and are excluded from git.
 
 ### Intelligence Layer
 
@@ -346,11 +363,10 @@ The system automatically adjusts:
 
 ### Data Privacy & Security
 
-- ✅ **All data stays local** on your machine
-- ✅ **No external API calls** (except Claude Code itself)
-- ✅ **Automatic .gitignore** prevents committing personal data
-- ✅ **Automatic backups** to `.backups/` directory
-- ✅ **No tracking, no analytics, no telemetry**
+- ✅ **Tracking databases and session transcripts stay local** on your machine, automatically excluded from git via `.gitignore`.
+- ✅ **Kokoro and `say` synthesize speech locally** on macOS; no voice API key or usage billing is required.
+- ✅ **No tracking, no analytics, no telemetry** from this project.
+- ✅ **Automatic backups** to `.backups/` directory.
 
 ### Hooks System (Automated Data Management)
 
@@ -429,7 +445,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support & Community
 
 - 📖 **Documentation:** [Full docs in this repo](docs/)
-- 🐛 **Bug Reports & Questions:** [GitHub Issues](https://github.com/m98/fluent/issues)
+- 🐛 **Bug Reports & Questions:** [GitHub Issues](https://github.com/alklimover/english-coach/issues)
 - 📧 **Email:** For sensitive issues
 
 ---
@@ -450,7 +466,7 @@ It helps others discover this project and motivates us to keep improving it!
 - **Install paths:** 2 (Claude Code plugin + git clone — both supported)
 - **Languages Supported:** All (system is fully language-agnostic)
 - **Learning Methods:** 6 evidence-based principles
-- **Contributors:** [See contributors](https://github.com/m98/fluent/graphs/contributors)
+- **Contributors:** [See contributors](https://github.com/alklimover/english-coach/graphs/contributors)
 
 ---
 
@@ -474,15 +490,8 @@ Check the data-dir resolution order (see above). Set `FLUENT_DATA_DIR` explicitl
 **JSON validation fails after a manual edit.**
 The PostToolUse hook exits with status 2 if it finds malformed JSON. The last 10 backups live at `<data_dir>/<filename>.json.backup-<timestamp>`. Restore with: `cp <data_dir>/learner-profile.json.backup-XXXXXX <data_dir>/learner-profile.json`.
 
-**Skills don't appear in the `/` menu after plugin install.**
-Restart Claude Code. If still missing, verify install:
-
-```bash
-claude plugin list                              # should show fluent@m98 enabled
-claude plugin validate fluent@m98
-```
-
-Or from inside a session: `/plugin list`. If the plugin is disabled, enable it: `claude plugin enable fluent@m98`.
+**Skills don't appear in the `/` menu.**
+Make sure you launched Claude Code from the `english-coach/` project folder. Skills are loaded from `.claude/skills/` inside the repo; they are not installed via the plugin marketplace in this project-folder workflow. Restart Claude Code from the repo root if needed.
 
 ---
 
@@ -500,7 +509,7 @@ Or from inside a session: `/plugin list`. If the plugin is disabled, enable it: 
 ## ❓ FAQ
 
 **Q: How is this different from Duolingo/Babbel/etc?**
-A: It’s ultra-minimalistic, just a terminal and pure learning. No extra distributions, no ads, no gimmicks. Infinitely adaptable. You ask it to teach you something, and it does. And best of all, everything stays private on your machine.
+A: It’s ultra-minimalistic: a terminal, your existing Claude Code subscription, local TTS, and pure learning. No ads, no paid voice API, no gimmicks. You ask it to teach you something, and it adapts while keeping learner data local.
 
 **Q: Do I need to know how to code?**
 A: No! Just install Claude Code and run `/fluent-setup`. That's it.
@@ -512,7 +521,7 @@ A: Most learners see measurable improvement within the first week. The system tr
 A: Yes! The system adapts to your goals. Tell it you're preparing for DELE/DELF/TestDaF/etc. and it'll focus on exam-relevant content.
 
 **Q: Is my data safe?**
-A: Absolutely. Everything stays on your machine. No cloud storage, no external servers (except Claude Code itself).
+A: Learning databases, session transcripts, and TTS stay on this machine and are excluded from git. Kokoro and `say` do not send audio to a voice API; dictation privacy depends on how you configure Handy.
 
 **Q: Can I export my progress?**
 A: Yes! All data is in human-readable JSON. You can export, analyze, or migrate it anytime.
@@ -528,8 +537,8 @@ But feel free to experiment and share your findings!
 *Start your language learning journey today!* 🚀
 
 ```bash
-git clone https://github.com/m98/fluent.git
-cd fluent
+git clone https://github.com/alklimover/english-coach.git
+cd english-coach
 claude
-/fluent-setup
+/coach-intro
 ```

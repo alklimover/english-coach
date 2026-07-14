@@ -363,5 +363,49 @@ class UpdateDbSmokeTest(unittest.TestCase):
                 self.assertEqual(after, before)
 
 
+    # --- argv payload (english-coach fork; upstream PR #11) ---
+
+    def _run_argv(self, payload_str: str, cwd: Path = None):
+        return subprocess.run(
+            ["python3", str(SCRIPT), payload_str],
+            cwd=str(cwd or self.tmp),
+            capture_output=True,
+        )
+
+    def test_argv_payload_updates_databases(self):
+        proc = self._run_argv(json.dumps(SESSION_PAYLOAD))
+        self.assertEqual(proc.returncode, 0,
+                         msg=f"stdout={proc.stdout!r} stderr={proc.stderr!r}")
+        log = self._load("session-log.json")
+        self.assertEqual(log["sessions"][-1]["session_id"], "session-002")
+        profile = self._load("learner-profile.json")
+        self.assertEqual(profile["current_streak_days"], 3)
+
+    def test_argv_invalid_json_exits_1_no_mutation(self):
+        proc = self._run_argv("{not json")
+        self.assertEqual(proc.returncode, 1)
+        self.assertTrue(proc.stderr, "expected an error message on stderr")
+        log = self._load("session-log.json")
+        self.assertEqual(len(log["sessions"]), 1)
+
+    def test_argv_equivalent_to_stdin(self):
+        tmp2 = Path(tempfile.mkdtemp(prefix="fluent-test-argv-"))
+        self.addCleanup(shutil.rmtree, tmp2, ignore_errors=True)
+        (tmp2 / "data").mkdir()
+        make_fixtures(tmp2 / "data")
+
+        proc_stdin = self._run(SESSION_PAYLOAD)
+        proc_argv = self._run_argv(json.dumps(SESSION_PAYLOAD), cwd=tmp2)
+        self.assertEqual(proc_stdin.returncode, 0, msg=proc_stdin.stderr)
+        self.assertEqual(proc_argv.returncode, 0, msg=proc_argv.stderr)
+        for name in ("learner-profile.json", "progress-db.json",
+                     "mistakes-db.json", "mastery-db.json",
+                     "spaced-repetition.json", "session-log.json"):
+            with open(self.tmp / "data" / name) as f1, \
+                 open(tmp2 / "data" / name) as f2:
+                self.assertEqual(json.load(f1), json.load(f2),
+                                 msg=f"stdin/argv divergence in {name}")
+
+
 if __name__ == "__main__":
     unittest.main()

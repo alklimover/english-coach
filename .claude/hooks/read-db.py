@@ -49,6 +49,67 @@ def next_session_id(sessions: list) -> str:
     return f"session-{len(sessions) + 1:03d}"
 
 
+def _session_date(s: dict):
+    """Parse a session's date to a date object, or None if unparseable."""
+    raw = s.get("date")
+    if not isinstance(raw, str):
+        return None
+    try:
+        return datetime.strptime(raw, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def _duration_minutes(s: dict) -> int:
+    """Return non-negative duration minutes, or 0 for missing/invalid/negative."""
+    raw = s.get("duration_minutes", 0)
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return 0
+    if not (value >= 0):
+        return 0
+    try:
+        return int(value)
+    except (ValueError, OverflowError):
+        return 0
+
+
+def _is_speaking(s: dict) -> bool:
+    """A speaking session = voice practice (the north-star activity)."""
+    return "speaking" in s.get("skills_practiced", [])
+
+
+def speaking_stats(sessions: list, now: datetime):
+    """North-star metric: speaking minutes in the current (Mon-Sun) week and
+    the consecutive-day speaking streak. Speaking minutes — not total study
+    minutes — is the plan's success signal."""
+    today = now.date()
+    week_start = today - timedelta(days=today.weekday())  # Monday
+
+    minutes_this_week = 0
+    speaking_days = set()
+    for s in sessions:
+        if not _is_speaking(s):
+            continue
+        d = _session_date(s)
+        if d is None:
+            continue
+        speaking_days.add(d)
+        if week_start <= d <= today:
+            minutes_this_week += _duration_minutes(s)
+
+    # Streak: consecutive days ending today (or yesterday if nothing today yet).
+    streak = 0
+    if speaking_days:
+        cursor = today if today in speaking_days else today - timedelta(days=1)
+        while cursor in speaking_days:
+            streak += 1
+            cursor -= timedelta(days=1)
+
+    return minutes_this_week, streak
+
+
 def main():
     databases = {}
     missing = []
@@ -80,6 +141,8 @@ def main():
     except ValueError:
         days_since = None
 
+    speaking_minutes_week, speaking_streak = speaking_stats(sessions, now)
+
     result = {
         "databases": databases,
         "computed": {
@@ -89,6 +152,8 @@ def main():
             "next_session_id": next_session_id(sessions),
             "streak_active": streak_active,
             "days_since_last_session": days_since,
+            "speaking_minutes_this_week": speaking_minutes_week,
+            "speaking_streak_days": speaking_streak,
         },
     }
 

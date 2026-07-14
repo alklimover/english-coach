@@ -137,21 +137,21 @@ Call the `fluent-db-updater` skill's workflow — one `update-db.py` invocation 
 
 > ## Word 1/15
 >
-> **Dutch:** de keuken
+> **English:** to hire
 >
-> **Context:** "De keuken is klein maar mooi."
+> **Context:** "We're hiring two engineers this quarter."
 >
-> **What does it mean in English?**
+> **What does it mean in Russian?**
 >
 > Type your answer:
 
-Learner: "the kitchen"
+Learner: "нанимать"
 
 > ✅ Exactly.
 >
-> **Answer:** the kitchen
-> **Meaning:** A room used for cooking and food preparation.
-> **Example:** "De keuken is klein maar mooi." (The kitchen is small but pretty.)
+> **Answer:** нанимать (брать на работу)
+> **Meaning:** To employ someone for a job.
+> **Example:** "We're hiring two engineers this quarter." (Мы нанимаем двух инженеров в этом квартале.)
 >
 > **Score: 10/10** 🎯
 >
@@ -161,15 +161,15 @@ Learner: "the kitchen"
 
 > ## Word 7/15
 >
-> **English:** to write
->
-> **How do you say this in Dutch?**
+> **Russian:** обсудить
 
-Learner: "schrijven"
+> **How do you say this in English?**
 
-> ✅ Correct — infinitive form.
+Learner: "to discuss about"
+
+> ⚠️ Almost — "discuss" takes **no preposition**: *discuss the plan*, not ~~discuss about the plan~~.
 >
-> Now: can you also give the first-person present? (I write → …)
+> Now: use it in a short sentence about tomorrow's meeting.
 
 ### Example 3 — session end summary
 
