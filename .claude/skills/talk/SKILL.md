@@ -94,12 +94,13 @@ Load the `fluent-db-updater` skill and send one payload:
 - `new_vocabulary[]` — the 5 phrases as `item_type: "phrase"` (content = the phrase, answer = when/how to use it, category = scenario).
 - `review_results[]` — for due SRS items actually used by the learner in conversation.
 - `focus_next_session[]` — the single focus.
+- `profile_updates.current_level` — only when this is the first completed speaking session and the profile has no assessed level; use a standard CEFR value, not a `+` ladder label.
 
 Then write the transcript to `results/talk-session-{NNN}.md` ({NNN} = `next_session_id`, zero-padded): scenario, date, full exchange, the four review blocks.
 
 If today's conversation was a planned activity in `data/weekly-plan.json` — mark that activity `done` and set its `session_ref` to the session id. No plan file → skip silently.
 
-First session only: after persisting, set the gauged `learner.current_level` in `data/learner-profile.json` (single targeted edit) and mention it in the review.
+First completed speaking session only: mention the gauged level in the review and include it in the same updater payload. Never edit `learner-profile.json` directly.
 
 ### 7. Interrupted session
 

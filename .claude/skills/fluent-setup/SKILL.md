@@ -86,15 +86,7 @@ Use the `AskUserQuestion` tool to gather questions in batches when possible. Req
 10. **Learning style** — conversational / academic / immersive / balanced (default).
 11. **Gamification on/off** — default on.
 
-If the learner picks "not sure" for current level, run a quick 5-question assessment:
-
-1. Basic vocabulary recognition → A1
-2. Simple sentence construction → A2
-3. Past tense usage → B1
-4. Complex subordinate clauses → B2
-5. Idiomatic expression → C1
-
-Map score to level: 0-1 correct = A1, 2 = A2, 3 = B1, 4 = B2, 5 = C1.
+If the learner picks "not sure", do not substitute the old written five-question quiz. Store `learner.current_level: null` and add `"speaking placement"` to `preferences.pending_setup`. After the six files exist, offer the voice `coach-intro` placement described in Step 6.
 
 ### 4. Generate the learning plan
 
@@ -147,7 +139,7 @@ The only learner-facing action is to say «начинаем» or describe what t
 - Target date: {target_level}!
 
 ### Next Steps
-The profile is ready. Build the current week autonomously, then offer the first activity in one sentence. The learner should not have to remember a schedule or command.
+The profile is ready. Offer the voice placement conversation first. After it succeeds—or immediately if the learner defers it—build the current week autonomously and offer the next activity in one sentence. The learner should not have to remember a schedule or command.
 
 **Your journey to {target_language} fluency starts now!** 🚀
 ```
@@ -165,17 +157,15 @@ Start from the templates in `data-examples/`. Resolve the target directory via `
 
 Use the Write tool for each. Do not call `update-db.py` — that script is for session updates, not bootstrapping.
 
-### 6. Optional first lesson
+### 6. Voice placement handoff
 
-```markdown
-## 🎓 Want to start your first lesson now?
+After all six databases exist, offer one natural next step:
 
-A quick 5-10 min intro session to learn your first 10 words and get familiar with the system.
+> «Профиль готов. Проведём короткую голосовую диагностику, чтобы проверить уровень и точнее собрать план?»
 
-Type "yes" to start, "later" to begin on your own.
-```
+On natural agreement, internally run `coach-intro`. It explains the process, performs the announced speaking ladder, persists the CEFR verdict and interests through `fluent-db-updater`, then builds the week. Do not run `fluent-learn` first and do not require the learner to know a skill or command name.
 
-If yes, hand off to the `fluent-learn` skill.
+If the learner defers, preserve any self-reported level, leave `onboarding_completed` absent, and build a conservative week. Offer the placement again on a later first contact.
 
 ## Profile Updates (existing profile)
 
@@ -202,7 +192,7 @@ If a profile exists, do only the action the learner requested. If the request is
 
 ### Example 1 — first-time setup flow
 
-Learner says «давайте настроим репетитора», agrees to create the local profile, and answers the onboarding questions. Then create the databases and offer the first lesson naturally.
+The learner says «давайте настроим репетитора», agrees to create the local profile, and answers the bootstrap questions. Create all six databases, then offer the voice placement naturally. On agreement, hand off to `coach-intro`; after its verdict, build the weekly plan.
 
 ### Example 2 — returning-user profile reset
 

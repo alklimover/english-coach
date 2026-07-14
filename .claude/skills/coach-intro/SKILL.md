@@ -70,9 +70,17 @@ Confirm/refine conversationally or via AskUserQuestion:
 
 ### 6. Record and persist
 
-1. Update `data/learner-profile.json` (targeted edits): `learner.current_level`, `preferences.interests: [...]`, `preferences.onboarding_completed: "YYYY-MM-DD"`, refresh `focus_areas` if the verdict changed them.
-2. Persist the probe conversation via `fluent-db-updater`: `command_used: "/coach-intro"`, `skills_practiced: ["speaking"]`, real duration; `errors[]` = the verdict's "что ломается" items (reuse watch-pattern ids where they match); good phrases → SRS.
-3. Transcript → `results/coach-intro-{NNN}.md` (probes + verdict).
+Submit one complete session report through `fluent-db-updater`. Include:
+
+- `profile_updates.current_level`: the final standard CEFR verdict (`A1`, `A2`, `B1`, `B2`, `C1`, or `C2`; never a ladder label such as `B1+`);
+- `profile_updates.interests`: the confirmed 3–5 material interests;
+- `profile_updates.onboarding_completed`: the session date (`YYYY-MM-DD`);
+- `profile_updates.focus_areas`: refreshed areas when the verdict changes them;
+- `command_used: "/coach-intro"`, `skills_practiced: ["speaking"]`, and real duration;
+- `errors[]`: only the verdict's real “что ломается” items, reusing watch-pattern IDs where they match;
+- good phrases as new SRS items.
+
+Do not edit `learner-profile.json` directly. Save the transcript separately to `results/coach-intro-{NNN}.md` after the database batch succeeds.
 
 ### 7. Hand off
 

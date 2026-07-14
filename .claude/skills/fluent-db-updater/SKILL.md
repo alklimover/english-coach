@@ -1,13 +1,13 @@
 ---
 name: fluent-db-updater
-description: Atomically update all 6 Fluent learner databases (learner-profile, progress, mistakes, mastery, spaced-repetition, session-log) at session end by calling .claude/hooks/update-db.py with a single JSON payload. Use at the end of every practice session — fluent-writing, fluent-vocab, fluent-speaking, fluent-reading, fluent-review, fluent-learn — to persist the session's errors, review results, new vocabulary, and session metadata.
+description: Apply one end-of-session report to all 6 Fluent learner databases (learner-profile, progress, mistakes, mastery, spaced-repetition, session-log) by calling .claude/hooks/update-db.py. Use after a successful practice or coach-intro session to persist errors, review results, new vocabulary, profile metadata, and session metadata. Each JSON file is replaced atomically after a backup; the six-file batch is not transactional.
 ---
 
 # DB Updater
 
 ## Overview
 
-Every practice skill ends with a DB update. Instead of hand-editing 6 JSON files (error-prone, racy, easy to desync), pipe one JSON report to `update-db.py`. The script runs pre-write backups, validates the payload, applies all changes atomically via `.tmp + fsync + rename`, and rebuilds the spaced-repetition queue.
+Every successful practice or coach-intro session ends with one DB batch. Instead of hand-editing 6 JSON files, pipe one JSON report to `update-db.py`. The script validates the payload, creates pre-write backups, updates each file via `.tmp + fsync + rename`, and rebuilds the spaced-repetition queue. Individual file replacement is atomic; the six-file batch is not a transaction.
 
 ## When to Use
 
@@ -18,7 +18,7 @@ Load this skill whenever the tutor:
 - Needs to record new errors, review results, or mastery changes.
 - Needs to bump `total_sessions`, `current_streak_days`, or `total_study_minutes`.
 
-Skip this skill for read-only operations (use the `fluent-progress` skill or `read-db.py` directly) and during session setup (use `fluent-setup` skill instead — `update-db.py` is for session deltas, not bootstrap).
+Skip this skill for read-only operations (use `fluent-progress` or `read-db.py`). Initial profile creation/reset belongs to `fluent-setup`; profile refinements from a completed `coach-intro` belong in `profile_updates`.
 
 ## Instructions
 
@@ -47,7 +47,7 @@ Exit codes: `0` success, `1` validation error, `2` I/O error.
 ${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/references/db-updater-payload.example.json
 ```
 
-Key blocks the example covers: `skill_scores`, `errors[]`, `new_vocabulary[]`, `review_results[]`, `topics_covered`, `breakthroughs`, `focus_next_session`, `session_notes`, `achievements_earned`, `milestones`.
+Key blocks the example covers: `profile_updates`, `skill_scores`, `errors[]`, `new_vocabulary[]`, `review_results[]`, `topics_covered`, `breakthroughs`, `focus_next_session`, `session_notes`, `achievements_earned`, `milestones`.
 
 ### 3. Field notes
 
@@ -57,6 +57,7 @@ Key blocks the example covers: `skill_scores`, `errors[]`, `new_vocabulary[]`, `
 - `skill_scores[].correct` counts correct exercises, not a percentage. Accuracy is derived.
 - `confidence` in `learner-profile.skills` is 0–100 integer; `accuracy` in `progress-db` is 0.0–1.0 float. The script handles the conversion.
 - `milestones[]` — each entry is a bare string OR an object `{ "milestone": <required non-empty string>, "date": <optional YYYY-MM-DD, defaults to the session date> }`. Don't set a nested `session_id`; the script stamps the authoritative top-level one. A malformed entry (neither string nor object, or an object missing/empty `milestone`) exits `1` with no files written. Each milestone becomes both a `session-log.milestones[]` record and a `learner-profile.achievements[]` entry.
+- `profile_updates` — optional onboarding refinements applied to `learner-profile.json` in the same final batch. Allowed fields: standard CEFR `current_level` (`A1`–`C2`, no `+` ladder labels), string arrays `interests` and `focus_areas`, and `onboarding_completed` as `YYYY-MM-DD`. Unknown or malformed fields exit `1` before files are written.
 
 ### 4. Read before writing
 

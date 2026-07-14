@@ -7,6 +7,13 @@
   "command_used": "/fluent-learn",
   "skills_practiced": ["vocabulary", "writing"],
 
+  "profile_updates": {
+    "current_level": "B1",
+    "interests": ["product management", "AI", "business communication"],
+    "onboarding_completed": "2026-04-24",
+    "focus_areas": ["articles", "spontaneous speaking"]
+  },
+
   "skill_scores": {
     "vocabulary": { "exercises": 5, "correct": 4, "time_minutes": 10 },
     "writing":    { "exercises": 3, "correct": 3, "time_minutes": 10 }

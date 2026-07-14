@@ -136,6 +136,50 @@ def normalize_milestones(session: dict) -> list:
     return normalized
 
 
+def normalize_profile_updates(session: dict) -> dict:
+    """Validate optional onboarding/profile metadata before touching disk."""
+    updates = session.get("profile_updates", {})
+    if not isinstance(updates, dict):
+        print("[Fluent] Error: 'profile_updates' must be an object", file=sys.stderr)
+        sys.exit(1)
+
+    allowed = {"current_level", "interests", "onboarding_completed", "focus_areas"}
+    unknown = set(updates) - allowed
+    if unknown:
+        print(f"[Fluent] Error: unsupported profile_updates fields: {sorted(unknown)}", file=sys.stderr)
+        sys.exit(1)
+
+    current_level = updates.get("current_level")
+    if current_level is not None:
+        if current_level not in {"A1", "A2", "B1", "B2", "C1", "C2"}:
+            print("[Fluent] Error: profile_updates.current_level must be a supported CEFR level", file=sys.stderr)
+            sys.exit(1)
+
+    for field in ("interests", "focus_areas"):
+        value = updates.get(field)
+        if value is not None and (
+            not isinstance(value, list)
+            or any(not isinstance(item, str) or not item.strip() for item in value)
+        ):
+            print(f"[Fluent] Error: profile_updates.{field} must be a list of non-empty strings", file=sys.stderr)
+            sys.exit(1)
+
+    completed = updates.get("onboarding_completed")
+    if completed is not None:
+        try:
+            parse_date(completed)
+        except (TypeError, ValueError):
+            print("[Fluent] Error: profile_updates.onboarding_completed must be YYYY-MM-DD", file=sys.stderr)
+            sys.exit(1)
+
+    normalized = copy.deepcopy(updates)
+    for field in ("interests", "focus_areas"):
+        if field in normalized:
+            normalized[field] = [item.strip() for item in normalized[field]]
+    session["profile_updates"] = normalized
+    return normalized
+
+
 def backup_all(tag: str):
     backup_path = BACKUP_DIR / tag
     backup_path.mkdir(parents=True, exist_ok=True)
@@ -214,6 +258,16 @@ def update_learner_profile(profile: dict, session: dict):
 
     if session.get("focus_areas"):
         profile["focus_areas"] = session["focus_areas"]
+
+    profile_updates = session.get("profile_updates", {})
+    if "current_level" in profile_updates:
+        profile.setdefault("learner", {})["current_level"] = profile_updates["current_level"]
+    if "interests" in profile_updates:
+        profile.setdefault("preferences", {})["interests"] = profile_updates["interests"]
+    if "onboarding_completed" in profile_updates:
+        profile.setdefault("preferences", {})["onboarding_completed"] = profile_updates["onboarding_completed"]
+    if "focus_areas" in profile_updates:
+        profile["focus_areas"] = profile_updates["focus_areas"]
 
     for m in session.get("milestones", []):
         profile.setdefault("achievements", []).append({
@@ -547,6 +601,7 @@ def main():
     # Validate + canonicalize milestones before touching any DB (exits 1 on
     # malformed input, so disk stays untouched on a validation failure).
     normalize_milestones(session)
+    normalize_profile_updates(session)
 
     session.setdefault("duration_minutes", 0)
 

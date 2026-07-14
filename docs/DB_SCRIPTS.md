@@ -55,6 +55,12 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db
   "duration_minutes": 20,
   "command_used": "/fluent-learn",
   "skills_practiced": ["vocabulary", "writing"],
+  "profile_updates": {
+    "current_level": "B1",
+    "interests": ["product management", "AI"],
+    "onboarding_completed": "2026-04-24",
+    "focus_areas": ["articles", "spontaneous speaking"]
+  },
   "skill_scores": {
     "vocabulary": { "exercises": 5, "correct": 4, "time_minutes": 10 },
     "writing":    { "exercises": 3, "correct": 3, "time_minutes": 10 }
@@ -117,7 +123,7 @@ Everything else is optional; omitted fields do not update.
 ### Exit codes
 - `0` success
 - `1` validation error (bad/missing JSON, missing required field)
-- `2` I/O or logic error (full traceback on stderr; no files were modified)
+- `2` I/O or logic error. Validation and in-memory update failures occur before writes; a save failure can leave a partial six-file batch, recoverable from `data/.backups/pre-update-{session_id}/` (or the equivalent resolved data directory).
 
 ## Data model notes
 
@@ -131,6 +137,7 @@ Everything else is optional; omitted fields do not update.
   `mastery_level`, `total_reviews`, `priority`, `content`, `answer`,
   `category`, `difficulty` — supply these in `new_vocabulary` payloads so new
   items are fully populated.
+- `profile_updates` optionally refines onboarding metadata in `learner-profile.json`: standard CEFR `current_level` (`A1`, `A2`, `B1`, `B2`, `C1`, `C2`), string arrays `interests` and `focus_areas`, and `onboarding_completed` as `YYYY-MM-DD`. Unknown or malformed fields are rejected before writes.
 - `milestones[]` accepts **either** a bare string **or** an object
   `{ "milestone": <required non-empty string>, "date": <optional YYYY-MM-DD,
   defaults to the session date> }`. A nested `session_id` is ignored — the

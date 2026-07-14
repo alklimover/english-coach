@@ -363,6 +363,46 @@ class UpdateDbSmokeTest(unittest.TestCase):
                 self.assertEqual(after, before)
 
 
+    def test_onboarding_profile_updates_in_final_batch(self):
+        payload = dict(SESSION_PAYLOAD)
+        payload["session_id"] = "coach-intro-002"
+        payload["profile_updates"] = {
+            "current_level": "B2",
+            "interests": ["product management", "AI"],
+            "onboarding_completed": "2026-04-24",
+            "focus_areas": ["articles", "spontaneous speaking"],
+        }
+
+        proc = self._run(payload)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        profile = self._load("learner-profile.json")
+        self.assertEqual(profile["learner"]["current_level"], "B2")
+        self.assertEqual(profile["preferences"]["interests"],
+                         ["product management", "AI"])
+        self.assertEqual(profile["preferences"]["onboarding_completed"],
+                         "2026-04-24")
+        self.assertEqual(profile["focus_areas"],
+                         ["articles", "spontaneous speaking"])
+
+    def test_invalid_profile_updates_exit_1_without_mutation(self):
+        bad_updates = [
+            {"current_level": "B3"},
+            {"current_level": "B1+"},
+            {"interests": "AI"},
+            {"onboarding_completed": "24-04-2026"},
+            {"unknown": True},
+        ]
+        for n, updates in enumerate(bad_updates):
+            with self.subTest(updates=updates):
+                payload = dict(SESSION_PAYLOAD)
+                payload["session_id"] = f"coach-intro-bad-{n}"
+                payload["profile_updates"] = updates
+                before = self._load("learner-profile.json")
+                proc = self._run(payload)
+                self.assertEqual(proc.returncode, 1, msg=proc.stderr)
+                self.assertEqual(self._load("learner-profile.json"), before)
+
+
     # --- argv payload (english-coach fork; upstream PR #11) ---
 
     def _run_argv(self, payload_str: str, cwd: Path = None):
