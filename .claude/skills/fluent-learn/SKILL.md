@@ -24,7 +24,7 @@ On first contact without a profile, offer natural-language setup instead of star
 python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/read-db.py"
 ```
 
-Need all 6 DBs. If any missing, direct the learner to `/fluent-setup` and stop.
+Need all 6 DBs. If any are missing, offer natural-language profile setup and stop; start it only after the learner agrees.
 
 ### 2. Analyze today's plan
 

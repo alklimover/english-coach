@@ -14,10 +14,11 @@ Removes the "what should I do today" decision. The learner expresses readiness o
 
 ### 1. Resolve the current plan
 
-Read `data/weekly-plan.json`, determine the current ISO week and today's day code (`mon…sun`).
+Run `.claude/hooks/read-db.py`, then read `data/weekly-plan.json`. Determine the current ISO week, today's day code (`mon…sun`), `daily_goal_minutes`, and `computed.due_reviews_count`.
 
 - **No plan or a plan from an earlier week:** internally invoke `coach-plan` in autonomous mode, then continue here with the generated plan. Do not ask the learner to choose a command or construct the week.
 - **Nothing planned today:** choose the nearest not-yet-done activity that fits the remaining time. If none exists, start a short free conversation.
+- **Reviews are due:** if today's selected activity is not `review`, prepend a compact review when it and the activity fit `daily_goal_minutes`. Otherwise make review today's activity and leave the original activity `planned` for the nearest free slot. Never claim due items are included unless the review flow will actually run.
 
 ### 2. Start today's activity
 

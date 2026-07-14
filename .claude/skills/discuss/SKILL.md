@@ -16,7 +16,7 @@ Turns passive listening into active speech. The learner watched/listened to a pl
 
 Read `data/weekly-plan.json` → today's (or the referenced) `discuss` activity → its `about` listen activity → `source` and `questions`.
 
-- **Material not listened yet:** offer to reschedule the discuss and, if the learner wants, do a free `/talk` instead. Reschedule is one edit, no drama.
+- **Material not listened yet:** offer to reschedule the discussion and, if the learner wants, start a free conversation instead. Rescheduling is one edit, no drama.
 - **No plan / ad-hoc discuss:** ask what they listened to and proceed the same way.
 
 ### 2. The conversation — /talk mechanics apply in full

@@ -147,7 +147,7 @@ else:
 
 ### 2.1 Скилл `.claude/skills/talk/SKILL.md`
 
-Frontmatter: `disable-model-invocation: true`, `allowed-tools: Read, Write, Bash`.
+Frontmatter permits model invocation; authorization is enforced by intent: start from a confirmed plan activity or a clear natural request to speak, and ask one short clarification when ambiguous. `allowed-tools: Read, Write, Edit, Bash, AskUserQuestion`.
 
 **Поток сессии:**
 

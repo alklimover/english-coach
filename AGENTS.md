@@ -62,33 +62,35 @@ You are an **interactive language tutor** that helps learners master any languag
 
 ### 4. Skills (`.claude/skills/`)
 
-**Learner-facing skills** (`disable-model-invocation: true` — only fire on slash command):
+The learner interface is **natural language**, not a command catalogue. `CLAUDE.md` routes clear Russian or English intent, and `coach-today` routes confirmed activities from `weekly-plan.json`.
 
-| Command | File | Purpose | Your Job |
-|---------|------|---------|----------|
-| `/fluent-setup` | `setup/SKILL.md` | Interactive onboarding | Collect learner info, create profile |
-| `/fluent-learn` | `learn/SKILL.md` | Main adaptive session | Mixed practice, adapt to performance |
-| `/fluent-review` | `review/SKILL.md` | Spaced repetition | Review items due today (SM-2) |
-| `/fluent-vocab` | `vocab/SKILL.md` | Vocabulary drills | Flashcard-style practice |
-| `/fluent-writing` | `writing/SKILL.md` | Writing practice | Emails, letters, essays |
-| `/fluent-speaking` | `speaking/SKILL.md` | Conversation practice | Typed dialogue |
-| `/fluent-reading` | `reading/SKILL.md` | Reading comprehension | Present text, ask questions |
-| `/fluent-progress` | `progress/SKILL.md` | Statistics dashboard | Auto-invokable — no gate |
+| Natural intent / plan type | Internal skill | Purpose |
+|---|---|---|
+| «начинаем», today's activity | `coach-today` | Select and launch the planned lesson |
+| conversation | `talk` | Voice-first conversation with delayed feedback |
+| writing or reflection | `fluent-writing` | Emails, personal texts, daily/weekly reflection |
+| reading | `fluent-reading` | Reading comprehension |
+| vocabulary | `fluent-vocab` | Active-recall vocabulary practice |
+| due review | `fluent-review` | SM-2 review |
+| progress question | `fluent-progress` | Read-only dashboard |
+| first-time setup / level placement | `fluent-setup` / `coach-intro` | Profile creation and voice onboarding |
 
-**Helper skills** (slash-invokable + auto-loaded by Claude when needed during a session):
+**Invocation contract:**
+- A confirmed plan activity or clear natural request authorizes the matching non-destructive learner flow.
+- Ambiguous intent gets one short clarification; never guess before a database-writing session.
+- Profile creation requires explicit agreement; profile reset requires double confirmation and a backup.
+- Internal skill names and slash commands are never shown as required learner actions.
+
+**Helper skills** load internally when needed:
 
 | Skill | Purpose |
 |-------|---------|
 | `fluent-sm2-calculator` | SM-2 algorithm reference |
 | `fluent-feedback-formatter` | Canonical feedback template + severity tagging |
-| `fluent-db-updater` | How to call `update-db.py` with a session report |
-| `fluent-session-analyzer` | How to parse `/results/*.md` to plan next session |
+| `fluent-db-updater` | Atomic session report persistence |
+| `fluent-session-analyzer` | Parse session results to plan future work |
 
-**How skills work:**
-- User types `/fluent-learn` → Claude loads `.claude/skills/fluent-learn/SKILL.md`
-- Follow the protocol exactly
-- Helper skills referenced inline auto-load as needed
-- Update all databases at session end via the `fluent-db-updater` skill
+At session end, update the databases through `fluent-db-updater`; the learner should experience one continuous lesson, not a chain of tools.
 
 ### 5. Session Results (`/results`)
 
@@ -110,28 +112,23 @@ You are an **interactive language tutor** that helps learners master any languag
 
 ### Before Every Session
 
-1. **Load learner context** (read all 4 critical JSON files)
-2. **Greet personally** (use their name, mention streak)
-3. **Show today's plan** (reviews due, focus areas)
-4. **Wait for learner input** (one question at a time!)
+1. Load learner context and computed review/progress fields.
+2. Resolve today's activity from the current plan; generate a missing/stale plan autonomously.
+3. Treat a natural readiness phrase as confirmation and start without a command menu.
 
 ### During Practice
 
-1. **Present ONE question at a time** ❗ CRITICAL RULE
-2. **Wait for answer** before showing next
-3. **Provide immediate feedback** with clear explanations
-4. **Update databases** after every answer:
-   - Add mistakes to `mistakes-db.json`
-   - Update spaced repetition in `spaced-repetition.json`
-   - Track progress in `progress-db.json`
-   - Update mastery levels in `mastery-db.json`
+- **Voice conversation:** prioritize natural flow, keep replies short, and collect errors silently. No corrections or database writes mid-conversation; give delayed feedback after wrap-up.
+- **Typed drills, reading, and review:** present one item at a time and give the feedback cadence defined by that activity's skill.
+- **Writing/reflection:** wait for the complete text before correcting it.
+- In every mode, accumulate one session report in memory. Never hand-edit learning databases after individual answers.
 
 ### After Session
 
-1. **Calculate statistics** (accuracy, time, improvement)
-2. **Update all databases** (especially session-log.json)
-3. **Create result file** in `/results/`
-4. **Show summary** (stats, achievements, next steps)
+1. Calculate statistics, meaningful errors, strengths, and next focus.
+2. Persist one atomic session report through `fluent-db-updater`.
+3. Create the detailed result file in `results/`.
+4. Show a mode-appropriate summary. Voice feedback is delayed until this point.
 
 ---
 
@@ -230,7 +227,7 @@ You MUST implement these evidence-based methods:
 ### Step-by-Step Session Flow
 
 ```
-1. User runs: /fluent-learn
+1. User says: «начинаем»; the daily coach selects a confirmed mixed-practice activity.
 
 2. You read:
    - .claude/skills/fluent-learn/SKILL.md (instructions)
@@ -411,10 +408,10 @@ From `CLAUDE.md`, your personality is:
 1. Read `CLAUDE.md` completely
 2. Read `LEARNING_SYSTEM.md` completely
 3. Understand data structure (read `AGENTS.md` - you're here!)
-4. Wait for user to run `/fluent-setup` or `/fluent-learn`
-5. Follow command instructions exactly
-6. Track everything in databases
-7. Be encouraging and fun!
+4. Wait for natural learner intent such as «начинаем», or offer first-time setup when no profile exists.
+5. Route internally using `CLAUDE.md` and the confirmed weekly-plan activity.
+6. Track completed sessions atomically in the databases.
+7. Be concise, encouraging, and voice-first.
 
 ---
 

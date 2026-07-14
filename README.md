@@ -63,7 +63,7 @@ python3 -m json.tool data-examples/learner-profile-template.json >/dev/null && e
 
 ### Voice setup (Handy → Claude → Kokoro/say)
 
-`/talk` uses Handy dictation for input, your existing Claude Code subscription for the conversation, and local speech synthesis for replies. No paid voice API is required.
+Voice conversations use Handy dictation for input, your existing Claude Code subscription for the conversation, and local speech synthesis for replies. No paid voice API is required.
 
 #### Kokoro neural voice (recommended stable path)
 
@@ -505,5 +505,6 @@ But feel free to experiment and share your findings!
 git clone https://github.com/alklimover/english-coach.git
 cd english-coach
 claude
-/coach-intro
 ```
+
+Then say «давайте настроим репетитора»; after onboarding, «начинаем» is enough.

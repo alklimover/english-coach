@@ -103,7 +103,7 @@ First session only: after persisting, set the gauged `learner.current_level` in 
 
 ### 7. Interrupted session
 
-If the conversation ends before the review (learner disappears, terminal closes, explicit abort): write the transcript as `results/talk-session-{NNN}-partial.md`, do **not** run the DB update, leave any planned activity as `planned`. On the next `/talk`, offer: finish the review from the partial transcript, or start fresh.
+If the conversation ends before the review (learner disappears, terminal closes, explicit abort): write the transcript as `results/talk-session-{NNN}-partial.md`, do **not** run the DB update, leave any planned activity as `planned`. On the next natural request for a voice conversation, offer to finish the review from the partial transcript or start fresh.
 
 ## Critical Rules
 

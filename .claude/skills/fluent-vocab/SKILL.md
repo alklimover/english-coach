@@ -31,7 +31,7 @@ If the helper is unavailable, resolve `<data_dir>` via `fluent_paths.data_dir()`
 - `<data_dir>/mastery-db.json`
 - `<data_dir>/learner-profile.json` (for target_language, name, level)
 
-If any are missing, direct the learner to `/fluent-setup` and stop.
+If any are missing, offer natural-language profile setup and stop; start it only after the learner agrees.
 
 ### 2. Select words
 

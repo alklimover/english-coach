@@ -42,7 +42,7 @@ If the helper is unavailable, fall back to reading each file directly. Resolve t
 - `<data_dir>/spaced-repetition.json`
 - `<data_dir>/session-log.json`
 
-If any are missing, point the learner at `/fluent-setup` and stop.
+If any are missing, explain that the learning profile is not configured and offer to set it up naturally; proceed only after agreement.
 
 ### 2. Generate the report
 
