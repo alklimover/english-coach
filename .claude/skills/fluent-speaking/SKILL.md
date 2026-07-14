@@ -1,8 +1,7 @@
 ---
 name: fluent-speaking
-description: Run an interactive typed conversation session simulating spoken practice — free-flowing dialogue, role-plays, and opinion questions prioritizing communication over perfect grammar. Triggered only when the learner types /fluent-speaking. Asks questions one at a time in the target language, evaluates clarity and naturalness first and grammar second, and updates all databases at the end.
+description: Run a typed English conversation with role-plays and opinion questions, prioritizing communication and naturalness. Invoked only when the learner clearly asks for text-only conversation; ordinary requests to talk use the voice-first talk flow.
 allowed-tools: Read, Write, Bash
-disable-model-invocation: true
 ---
 
 # Speaking Practice (Typed)
@@ -13,9 +12,9 @@ Conversational practice through typed dialogue. Unlike `/fluent-writing`, priori
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-speaking`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+Run only from an unambiguous request for a typed/text-only conversation. Ordinary «давай поговорим» intent routes to the voice-first conversation flow.
 
-Skip this skill below A1 mastery 2 — the learner needs a basic word bank and verb conjugations first (run `/fluent-vocab` a few times).
+Below A1 mastery 2, automatically choose a short vocabulary warm-up before conversation rather than asking the learner to name another skill.
 
 ## Instructions
 
@@ -217,7 +216,7 @@ Learner: "I am {LEARNER_NAME}. I am founder of small company, we build software 
 - **Stay in the target language** for questions and transitions. Drop to native only for explanations.
 - **Praise natural expression.** If the learner uses "Well..." or "Actually..." correctly, call it out — those are fluency markers.
 - **Don't over-correct.** A speaking session with 20 red marks kills confidence.
-- **Never auto-invoke.** Gated; must fire only on explicit `/fluent-speaking`.
+- **Authorization boundary.** Start only when the learner clearly requests text-only conversation; ordinary talk intent is voice-first.
 
 ## Language Reference
 

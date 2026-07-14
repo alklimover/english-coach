@@ -218,7 +218,7 @@ Append this only if the learner seems new or asks what the numbers mean:
 >
 > Speaking / Writing / Reading: Not yet practiced.
 >
-> **Items Due Today:** 6 — run `/fluent-review` first.
+> **Items Due Today:** 6 — they will be included automatically in the next suitable lesson.
 >
 > "Three days in a row — momentum matters. Keep going!"
 

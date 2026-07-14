@@ -26,7 +26,7 @@ def main():
 
     if not profile_path.exists():
         print("[Fluent] 🌍 Welcome to Fluent - The AI Language Learning Kit!")
-        print("[Fluent] 📝 Run /fluent-setup to create your personalized learning profile")
+        print('[Fluent] 📝 Say "давайте настроим репетитора" to create your learning profile')
         sys.exit(0)
 
     try:
@@ -62,7 +62,7 @@ def main():
                         due_count += 1
 
                 if due_count > 0:
-                    print(f"[Fluent] 📅 {due_count} items due for review today - Run /fluent-review!")
+                    print(f"[Fluent] 📅 {due_count} items are due today — they will be included automatically")
 
             except Exception:
                 pass
@@ -101,7 +101,7 @@ def main():
                              or (a.get("source") or {}).get("title")
                              or a.get("about") or "")
                     extra = f" — {label}" if label else ""
-                    print(f"[Coach] 📅 Today's plan: {a.get('type')}{extra} — run /coach-today to start")
+                    print(f"[Coach] 📅 Today's plan: {a.get('type')}{extra} — say \"начинаем\" to start")
     except Exception:
         pass
 

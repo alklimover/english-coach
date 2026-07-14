@@ -1,8 +1,7 @@
 ---
 name: fluent-review
-description: Run today's spaced-repetition review queue — items scheduled by SM-2 that need reinforcement before the learner forgets them. Triggered only when the learner types /fluent-review. Pulls due items from spaced-repetition.review_queue.today, generates a targeted exercise for each, evaluates the response, updates SM-2 parameters, and reshelves items into the correct future queue.
+description: Run the spaced-repetition items due today. Invoked by a confirmed review activity in the weekly plan or clear natural intent such as "давай повторим" / "review what I learned"; generates targeted exercises, updates SM-2 parameters, and reschedules each item.
 allowed-tools: Read, Write, Bash
-disable-model-invocation: true
 ---
 
 # Spaced-Repetition Review Session
@@ -13,9 +12,9 @@ Replay items the learner learned before, timed so they hit just before the forge
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-review`. The skill is gated with `disable-model-invocation: true` — mutating SM-2 state from a misread prompt would cascade through every future session.
+Run only from a confirmed review activity selected by `coach-today` or an unambiguous natural request to review learned material. Ambiguous mentions of an old word are not authorization to mutate the SRS queue.
 
-Skip this skill when the queue is empty — suggest `/fluent-vocab` or `/fluent-learn` instead.
+If the queue is empty, naturally offer a short vocabulary exercise or today's next planned activity without naming internal skills.
 
 ## Instructions
 
@@ -27,16 +26,7 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/read-db.p
 
 Read `spaced-repetition.review_queue.today` and `daily_limits.review_items_per_day`. Sort items by `priority` (critical → high → medium → low). Cap at the daily limit (usually 20).
 
-If the queue is empty:
-
-```markdown
-🎉 No reviews due today! Your spaced repetition is up to date.
-
-Want to practice something new? Try:
-- `/fluent-learn` — adaptive mixed practice
-- `/fluent-vocab` — learn new words
-- `/fluent-progress` — see your stats
-```
+If the queue is empty, say naturally: "Сегодня повторять пока нечего. Можем перейти к запланированному занятию или немного потренировать новые слова." Follow the learner's ordinary-language choice.
 
 ### 2. Opening
 
@@ -204,8 +194,8 @@ Learner: "niet"
 
 ## Critical Rules
 
-- **Daily.** The whole system assumes the learner runs `/fluent-review` every day. Missing a day breaks the intended spacing.
-- **Never auto-invoke.** Gated; must fire only on explicit `/fluent-review`. Long interactive + SM-2 mutation.
+- **Plan-driven cadence.** The coach schedules reviews from the due queue; the learner never has to remember when to run them.
+- **Authorization boundary.** Start from a confirmed plan activity or clear request to review learned material, never from an incidental mention.
 - **One item at a time.** Rushing = false positives.
 - **Let the learner struggle.** If they don't remember, that's useful data (quality 0-2). The algorithm needs honest signals.
 - **Never hand-edit `spaced-repetition.json`.** Queue is rebuilt on every `update-db.py` call.

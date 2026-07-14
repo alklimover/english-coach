@@ -1,8 +1,7 @@
 ---
 name: fluent-reading
-description: Run an interactive reading comprehension session with a short target-language text followed by main-idea, detail, vocabulary-in-context, inference, and true/false questions. Triggered only when the learner types /fluent-reading. Presents the text, waits for the learner to read, then asks questions one at a time with immediate feedback, and optionally adds new vocabulary to the spaced-repetition queue.
+description: Run an interactive reading-comprehension session with a level-matched English text and main-idea, detail, vocabulary-in-context, inference, and true/false questions. Invoked by a confirmed reading activity or clear intent such as "давай почитаем" / "practice reading".
 allowed-tools: Read, Write, Bash
-disable-model-invocation: true
 ---
 
 # Reading Comprehension Session
@@ -13,9 +12,9 @@ Present one text (100-500 words depending on level), ask 4-6 comprehension quest
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-reading`. The skill is gated with `disable-model-invocation: true` — 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+Run only from a confirmed reading activity or an unambiguous natural request to practise reading. An incidental request to translate one sentence is not authorization for a full session.
 
-Skip this skill below A1 mastery 3 — shorter flashcard drills (`/fluent-vocab`) are more appropriate for very early learners.
+Below A1 mastery 3, automatically choose a shorter active-recall vocabulary exercise instead; do not make the learner select an internal skill.
 
 ## Instructions
 
@@ -256,7 +255,7 @@ Learner: "b"
 - **Ask questions in the target language** (at least from A2 up). Reading-comprehension checks should happen in the same language as the text.
 - **Quote the text** in explanations so the learner can trace the answer back to the source.
 - **Vocabulary opt-in.** Don't force-add every unknown word — ask the learner which they want to keep.
-- **Never auto-invoke.** Gated; must fire only on explicit `/fluent-reading`.
+- **Authorization boundary.** Start only from a confirmed reading activity or clear reading-practice intent.
 
 ## Sample Text Bank (Dutch A2)
 

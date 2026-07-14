@@ -55,20 +55,14 @@ Read the entire `LEARNING_SYSTEM.md` file to understand your full methodology, a
 | `LEARNING_SYSTEM.md` | **Your complete guide** | Read this for all methodology |
 | `PRACTICE.md` | How to analyze results & track patterns | Reference when updating tracking |
 
-### Available Slash Commands (Custom)
+### Internal skill flows
 
-When the learner uses these commands, follow their specific flows:
+Activity implementations live in `.claude/skills/<name>/SKILL.md`. Select them from natural intent and the weekly plan; never make the learner choose from a command catalogue.
 
-- **/fluent-learn** - Main learning session (adaptive, any skill)
-- **/fluent-vocab** - Vocabulary practice (flashcard-style)
-- **/fluent-writing** - Writing practice (emails, forms, letters)
-- **/fluent-speaking** - Speaking practice (typed conversation)
-- **/fluent-reading** - Reading comprehension
-- **/fluent-progress** - Show statistics, visualize progress
-- **/fluent-review** - Today's spaced repetition reviews
-- **/fluent-setup** - Interactive onboarding for new learners
-
-See `.claude/skills/` directory for detailed skill specifications. Each skill lives at `.claude/skills/<name>/SKILL.md` with YAML frontmatter. Learner-facing skills (`/fluent-setup`, `/fluent-learn`, `/fluent-vocab`, `/fluent-writing`, `/fluent-speaking`, `/fluent-reading`, `/fluent-review`) carry `disable-model-invocation: true` so they only fire when the learner types the slash command. `/fluent-progress` auto-invokes on stats questions. Helper skills (`fluent-sm2-calculator`, `fluent-feedback-formatter`, `fluent-db-updater`, `fluent-session-analyzer`) are also slash-invokable (no gating) and auto-load whenever Claude needs them during a session — they're visible in the slash menu so curious learners can open the reference directly.
+- Learner flows: adaptive practice, vocabulary, writing/reflection, conversation, reading, progress, review, onboarding, planning, and today's activity.
+- A confirmed plan activity or clear natural request authorizes the matching non-destructive learner flow.
+- Profile setup/reset remains protected: ask for explicit confirmation before creating, replacing, or resetting learner data.
+- Helper skills (`fluent-sm2-calculator`, `fluent-feedback-formatter`, `fluent-db-updater`, `fluent-session-analyzer`) load internally as needed and are never presented as learner actions.
 
 ## Learning Principles (Evidence-Based)
 
@@ -132,19 +126,28 @@ This deployment is a single-learner fork tuned for English:
 - **Spoken output.** In voice sessions every coach reply is spoken aloud via TTS (see `preferences.voice` in the learner profile). Keep replies short (2-3 sentences), conversational, **no markdown, no emojis** in anything that gets spoken.
 - **Explanation language: English by default.** Switch to Russian on request or when something is critically misunderstood.
 - **Watch patterns.** `mistakes-db.json` is pre-seeded with typical RU-speaker patterns at `frequency: 0` — they are watchlist entries, not real mistakes. Counters grow only from errors actually made in sessions.
-- **Voice sessions:** `/talk` — live conversation with delayed feedback (zero corrections mid-conversation; review comes after the wrap-up).
-- **Onboarding:** `/coach-intro` — transparent voice onboarding: system explained in Russian (on screen, never spoken), level placed via an announced ladder of English speaking probes, verdict in Russian, then hand-off to `/coach-plan`. Suggest it whenever `preferences.onboarding_completed` is absent.
+- **Voice conversation flow:** internal `talk` skill — delayed feedback, with no corrections mid-conversation.
+- **Onboarding flow:** internal `coach-intro` skill — explain the system in Russian on screen, place the level through announced English speaking probes, then build the week autonomously. Offer it when a profile exists but `preferences.onboarding_completed` is absent.
 
-## Intent Routing — the learner never needs to remember commands
+## Zero-command interface and intent routing
 
-Route natural-language intent (Russian or English, any phrasing) to the right skill. Slash commands still work and win when typed. When intent is ambiguous, ask one short question instead of guessing — sessions write to the databases.
+The learner interacts in natural Russian or English and never needs to know skill names. Slash commands are internal implementation details: they may still work when typed, but never list, teach, or require them in learner-facing prompts, startup messages, confirmations, or summaries.
 
-| Learner says something like | Run |
+Route clear natural-language intent to the matching skill. A confirmed activity from `weekly-plan.json` is also sufficient authorization for `coach-today` to launch its skill. If intent is ambiguous, ask one short natural question instead of guessing. Profile creation/reset and other destructive actions always require explicit confirmation.
+
+| Learner says something like | Internal flow |
 |---|---|
-| «давай заниматься», «что у нас сегодня?», "let's practice" | `coach-today` (default entry point) |
+| «начинаем», «давай заниматься», «что у нас сегодня?», "let's practice", "let's go" | `coach-today` (default entry point) |
 | «давай поговорим», «поболтаем по-английски», "let's talk" | `talk` |
 | «я послушал подкаст/видео», «обсудим материал» | `discuss` |
-| «спланируем неделю», «какой план?» | `coach-plan` |
-| первый контакт без онбординга, «как это всё работает?», «какой у меня уровень?» | `coach-intro` (offer first, start on agreement) |
+| «давай почитаем», «хочу потренировать чтение», "practice reading" | `fluent-reading` |
+| «давай текстом, без голоса», "text-only conversation" | `fluent-speaking` |
+| «хочу смешанный урок», "varied/mixed practice" | `fluent-learn` |
+| «спланируй неделю», «какой план?» | `coach-plan` |
+| «подведём итоги дня», «как прошёл мой день?», "daily reflection" | `fluent-writing` in `daily_reflection` mode |
+| «подведём итоги недели», «недельное ретро», "weekly reflection" | `fluent-writing` in `weekly_reflection` mode |
+| «проверим дневник», «проверь мою запись», "check my journal" | `fluent-writing` in journal-check mode; analyze the supplied text rather than inventing another task |
+| профиля ещё нет, «давайте настроим репетитора» | `fluent-setup` after agreement and write confirmation |
+| профиль есть, но онбординг не завершён; «как это всё работает?», «какой у меня уровень?» | `coach-intro` (offer first, start on agreement) |
 | «какой прогресс?», «покажи статистику» | `fluent-progress` |
 | «поработаем над письмом / словами / повторениями» | `fluent-writing` / `fluent-vocab` / `fluent-review` |

@@ -1,6 +1,6 @@
 # 🎙️ English Coach
 
-> **This is a fork of [m98/fluent](https://github.com/m98/fluent)** tuned for one thing: learning **English** through **voice-first practice** on a **weekly coaching program**. On top of the fluent core (6 tracking databases, SM-2 spaced repetition, 12 skills) it adds a voice conversation loop (`/talk` — dictated input, spoken output) and a coach layer that plans and drives your week. Run it as a project folder, not a plugin install. Your learning databases, transcripts, and voice synthesis stay local and out of git. Upstream credit: [Mohammad Kermani](https://github.com/m98).
+> **This is a fork of [m98/fluent](https://github.com/m98/fluent)** tuned for learning **English** through **voice-first practice** on an autonomous **weekly coaching program**. On top of the fluent core (6 tracking databases, SM-2 spaced repetition, and adaptive practice) it adds spoken conversation and a coach layer that plans and drives the week. The learner simply says «начинаем» or describes what they want naturally; internal skill names never need to be memorized. Run it as a project folder. Learning databases, transcripts, and voice synthesis stay local and out of git. Upstream credit: [Mohammad Kermani](https://github.com/m98).
 
 ---
 
@@ -35,12 +35,13 @@ Run everything from inside this folder. English Coach is designed as a project-f
 claude
 ```
 
-### 3. Onboard and start talking
+### 3. Start naturally
 
-```
-/coach-intro     # first contact: level placement and weekly plan
-/talk            # live voice conversation
-```
+When Claude Code opens, read today's one-line plan and say:
+
+> «Начинаем»
+
+On first contact, say «давайте настроим репетитора». After natural-language onboarding, the coach builds the week and offers the first activity itself.
 
 ---
 
@@ -200,91 +201,55 @@ This system implements proven learning science:
 
 ---
 
-## 🎮 Available Commands & Skills
+## Zero-command learner interface
 
-Fluent is built as **Claude Code skills** — 12 of them. Skills work two ways:
+The learner does not need to know commands or choose a skill. Open the project and say:
 
-1. **Type the slash command** (`/fluent-learn`, `/fluent-vocab`, etc.) — you explicitly start a session. Learner-facing skills are gated so they only run this way. No accidental 20-minute session triggered by a chat message.
-2. **Ask naturally** — read-only skills like `/fluent-progress` auto-trigger when you ask "how am I doing?" or "what's my streak?". Helper skills (SM-2 math, feedback formatter, DB updater, session analyzer) auto-load whenever Claude needs them during a session.
+> «Начинаем»
 
-All 12 skills appear in your `/` menu so you can always invoke any of them manually.
+English Coach reads the current week, includes due reviews, chooses today's activity, and starts it. If the weekly plan is missing or stale, it builds a conservative one from the profile, recent sessions, recurring mistakes, and available time before continuing.
 
-### Learner-facing commands
+Natural requests also work:
 
-These are the commands you'll use daily. Each is backed by a dedicated skill under `.claude/skills/`.
+| Say naturally | What happens |
+|---|---|
+| «Давай поговорим» | Starts a level-matched voice conversation |
+| «Подведём итоги дня» | Starts a 60–120 word daily reflection |
+| «Подведём итоги недели» | Starts a 120–220 word weekly reflection |
+| «Проверь мою запись» | Checks the supplied text without inventing another task |
+| «Давай почитаем» | Starts level-matched reading practice |
+| «Потренируем слова» | Starts a vocabulary activity when appropriate |
+| «Какой у меня прогресс?» | Shows the progress dashboard |
 
-#### Core Commands
+The weekly coach combines conversation, listening and discussion, writing or reflection, vocabulary, and spaced review. A missed activity is treated as planning data, not failure; the remaining week becomes lighter instead of accumulating a backlog.
 
-| Command | What It Does | When & Why to Use It |
-|---------|--------------|----------------------|
-| **`/fluent-setup`** | **One-time onboarding** - Asks you questions about your name, target language, current level, goals, and timeline. Creates your personalized learning profile. | **First time only** - Run this once to set up your account. The system generates a custom learning plan based on your answers. |
-| **`/fluent-learn`** | **Adaptive mixed practice** - Combines different exercise types (vocabulary, grammar, sentences) based on your weak areas. Adjusts difficulty in real-time based on your performance. | **Daily core practice** - Your main command for general improvement. The AI decides what you need to practice most. Best after `/fluent-review`. |
-| **`/fluent-review`** | **Spaced repetition session** - Shows you items that are due for review today based on the SM-2 algorithm. Focuses on things you learned before that need reinforcement. | **Start every day here!** - Review before learning new content. This is scientifically proven to be the most effective way to retain what you've learned. |
+Claude Code skills still implement these flows internally. Their names are an implementation detail: learner-facing startup messages, confirmations, and summaries use ordinary Russian or English.
 
-#### Skill-Specific Commands
+### Daily flow
 
-| Command | What It Does | When & Why to Use It |
-|---------|--------------|----------------------|
-| **`/fluent-vocab`** | **Flashcard-style vocabulary drills** - Rapid-fire translation practice (target language ↔ native language). Tracks which words you struggle with. | **2-3x per week** - When you need to build vocabulary quickly. Great for preparing for specific topics (travel, business, etc.). |
-| **`/fluent-writing`** | **Writing practice** - Practice emails, letters, essays, or forms in your target language. Get detailed corrections with grammar explanations. | **Daily for exam prep** - Essential if you're preparing for language exams. Also great for building confidence in real-world communication. |
-| **`/fluent-speaking`** | **Conversation practice** - Role-play scenarios through typed dialogue. Practice natural conversations, asking for directions, ordering food, etc. | **2-3x per week** - Builds confidence for real conversations. Typed practice helps you think through responses without pressure. |
-| **`/fluent-reading`** | **Reading comprehension** - Read short texts (stories, articles, dialogues) then answer comprehension questions. Expands vocabulary in context. | **2-3x per week** - Improves overall understanding. Best for intermediate+ learners. Reading is one of the fastest ways to absorb grammar patterns. |
+1. Open Claude Code in the `english-coach/` project.
+2. Read the one-line activity selected for today.
+3. Say «начинаем».
+4. Complete the activity and receive its feedback.
+5. The session, errors, review items, and progress are saved locally.
 
-#### Progress Command
-
-| Command | What It Does | When & Why to Use It |
-|---------|--------------|----------------------|
-| **`/fluent-progress`** | **Statistics dashboard** - Shows your accuracy trends, streak days, mastery levels, achievements unlocked, and weak areas. Visual progress charts. | **Weekly check-in** - Read-only and safe to auto-invoke. Ask "how am I doing?" and Claude will open the dashboard automatically. |
-
-### Helper skills (behind the scenes)
-
-These skills don't change what the learner-facing commands do — they let Claude apply the same algorithms, feedback format, and database logic consistently across every session. You can still invoke them via `/` if curious.
-
-| Skill | What It Does | When It Runs |
-|-------|--------------|--------------|
-| **`/fluent-sm2-calculator`** | SM-2 spaced-repetition algorithm reference: quality scale, interval formula, easiness-factor update, mastery-level transitions. | Auto-loaded whenever a review item is scored. |
-| **`/fluent-feedback-formatter`** | Canonical per-answer feedback template — severity tagging (🔴 critical / 🟡 moderate / 🟢 minor), category labels, tone rules. | Auto-loaded every time Claude grades an answer. |
-| **`/fluent-db-updater`** | How to call `update-db.py` with a single JSON payload that atomically updates all 6 databases at session end. | Auto-loaded when a session ends. |
-| **`/fluent-session-analyzer`** | Parses `/results/fluent-{skill}-session-{ID}.md` files to extract error patterns, strengths, and focus areas for the next session. | Auto-loaded when planning the next session. |
-
-### 📅 Recommended Daily Routine
-
-**🌅 Morning Session (15 min)**
-```bash
-/fluent-review    # Must do first - Review what you learned before
-/fluent-vocab     # Learn 5-10 new words
-```
-**Why?** Your brain is fresh. Reviewing first reinforces old knowledge, then new vocabulary sticks better.
-
-**🌙 Evening Session (15 min)**
-```bash
-/fluent-writing   # Practice real-world writing
-/fluent-learn     # Let AI choose what you need most
-```
-**Why?** Writing solidifies what you learned today. `/fluent-learn` fills in any gaps.
-
-**📊 Weekly Check-In (5 min)**
-```bash
-/fluent-progress  # See your stats and celebrate progress!
-```
-**Why?** Seeing improvement = motivation. You need to see you're getting better!
+Weekly reflections are scheduled near the end of the week by default. The original text, corrected version, and recurring errors are stored with the other writing-session results.
 
 ---
-
 ## 📁 System Architecture
 
 ### Data Layer (`/data` directory)
 
-**Your learning data is tracked in 6 JSON databases** (created automatically by `/fluent-setup`):
+**Your learning data is tracked in 6 JSON databases**, created during natural-language onboarding and updated automatically:
 
-| File | Purpose | Created When |
-|------|---------|--------------|
-| `learner-profile.json` | Your info, level, preferences, streak | `/fluent-setup` - One time |
-| `progress-db.json` | Overall statistics and trends | `/fluent-setup` - Updated every session |
-| `mistakes-db.json` | Error patterns with frequency and examples | `/fluent-setup` - Updated when you make mistakes |
-| `mastery-db.json` | Skill mastery levels (0-5 stars) | `/fluent-setup` - Updated after practice |
-| `spaced-repetition.json` | Review queue (SM-2 algorithm) | `/fluent-setup` - Updated after each answer |
-| `session-log.json` | Complete session history | `/fluent-setup` - New entry each session |
+| File | Purpose |
+|------|---------|
+| `learner-profile.json` | Learner information, level, preferences, streak |
+| `progress-db.json` | Overall statistics and trends |
+| `mistakes-db.json` | Real error patterns with frequency and examples |
+| `mastery-db.json` | Skill mastery levels |
+| `spaced-repetition.json` | SM-2 review queue |
+| `session-log.json` | Completed session history |
 
 **📋 Want to see the structure?** Check `/data-examples/` for template files showing the complete schema.
 
@@ -301,10 +266,10 @@ The AI follows these guides:
 
 ### Interface Layer
 
-- **Skills** (`.claude/skills/`) — 12 skills total. 8 learner-facing (`/fluent-setup`, `/fluent-learn`, `/fluent-vocab`, `/fluent-writing`, `/fluent-speaking`, `/fluent-reading`, `/fluent-review`, `/fluent-progress`) run when you invoke them. 4 helper skills (`/fluent-sm2-calculator`, `/fluent-feedback-formatter`, `/fluent-db-updater`, `/fluent-session-analyzer`) auto-load whenever Claude needs them during a session — and are also directly `/`-invokable if you want to read the reference.
-- **Plugin manifests** (`.claude-plugin/`) — `plugin.json` + `marketplace.json` make Fluent installable via `/plugin marketplace add m98/fluent`.
-- **Automatic Hooks** (`.claude/hooks/`) — SessionStart welcome, SessionEnd backups, PostToolUse JSON validation + backups, PreCompact safety backup. Both `hooks.json` (plugin mode) and `.claude/settings.json` (clone mode) wire them up.
-- **Session Results** (`/results/`) — Detailed practice logs per session, parsed by `fluent-session-analyzer` to plan future sessions.
+- **Zero-command routing** (`CLAUDE.md`) maps natural intent and confirmed plan activities to internal flows.
+- **Skills** (`.claude/skills/`) implement planning, conversation, writing/reflection, reading, vocabulary, review, progress, and database helpers behind the scenes.
+- **Automatic hooks** (`.claude/hooks/`) show today's activity and progress, validate data, and create safety backups.
+- **Session results** (`results/`) preserve detailed practice logs for future planning and error analysis.
 
 ---
 
@@ -512,7 +477,7 @@ Make sure you launched Claude Code from the `english-coach/` project folder. Ski
 A: It’s ultra-minimalistic: a terminal, your existing Claude Code subscription, local TTS, and pure learning. No ads, no paid voice API, no gimmicks. You ask it to teach you something, and it adapts while keeping learner data local.
 
 **Q: Do I need to know how to code?**
-A: No! Just install Claude Code and run `/fluent-setup`. That's it.
+A: No. Install Claude Code, open this project, and say «давайте настроим репетитора». After onboarding, say «начинаем» whenever you want to practise.
 
 **Q: How long until I see progress?**
 A: Most learners see measurable improvement within the first week. The system tracks everything so you can see exactly how you're improving.

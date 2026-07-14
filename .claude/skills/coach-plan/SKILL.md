@@ -1,6 +1,6 @@
 ---
 name: coach-plan
-description: Build the learner's weekly training plan from their data — weak skills, error patterns, SRS queue size, and last week's retro — through a short interview. Writes data/weekly-plan.json that /coach-today and /talk read all week. Fires on /coach-plan or when the learner asks to plan the week ("спланируем неделю", "какой план на неделю?", "plan my week"); cadence is Sunday retro → Monday plan.
+description: Build the learner's weekly training plan from weak skills, real error patterns, SRS load, recent capacity, and last week's retro. Runs from natural requests to plan the week and internally when coach-today finds no current plan. Writes data/weekly-plan.json for the daily orchestrator and activity skills.
 allowed-tools: Read, Write, Edit, Bash, AskUserQuestion
 ---
 
@@ -12,13 +12,12 @@ Turns the learner's accumulated data into a concrete week: which days, which act
 
 ## When to Use
 
-Trigger only on explicit `/coach-plan`. Normally run on Sunday or Monday (retro → plan cadence). Mid-week runs are fine — the plan is built from the current day to Sunday.
-
+Run when the learner naturally asks about the week, or internally from `coach-today` when `weekly-plan.json` is absent or belongs to an earlier ISO week. A current-week plan is never overwritten automatically; changing it mid-week requires a clear replan request.
 ## Instructions
 
 ### 0. Onboarding check
 
-If `preferences.onboarding_completed` is absent from the profile, suggest (don't force) running `/coach-intro` first: the plan is only as good as the level assessment and the interests list it's built on. If the learner wants a plan anyway, proceed with what's known and mark the week as calibration.
+If `preferences.onboarding_completed` is absent, offer the natural-language onboarding once. If the learner wants to start now, proceed with known data and mark the week as calibration; never require them to name a command.
 
 ### 1. Load context
 
@@ -38,13 +37,11 @@ If last week completed under 50%, this week gets **lighter** — fewer activitie
 
 **Self-tuning step:** skim the week's transcripts in `results/`. If a stable preference pattern shows up (formats that work or annoy, pacing, reply length, topics that spark real talk), propose one concrete edit to `CLAUDE.md`'s Local Context or a skill file — show the diff, apply only after the learner agrees. One tweak per week max; the tool adapts to the learner gradually, not in rewrites.
 
-### 3. Short interview
+### 3. Resolve availability without making the learner plan
 
-Three questions max (use AskUserQuestion where it helps):
+In autonomous mode, derive a conservative schedule from `daily_goal_minutes`, recent completed days, missed activities, and the current day. Do not interview the learner when these data are sufficient.
 
-1. Which days are realistic this week? (workload, travel)
-2. Anything you want more of / less of? (scenarios, formats)
-3. Did anything annoy you last week? (voice, difficulty, pacing)
+Ask at most one short question only when a fact blocks a safe plan — for example, whether travel leaves any practice days. Preferences about topics, pacing, and annoying formats should come from session history and natural feedback, not a mandatory questionnaire.
 
 ### 4. Generate the plan
 
@@ -52,16 +49,16 @@ Composition for a normal week — scale down to available days and `daily_goal_m
 
 - **3–4 × talk** — scenarios chosen against weak patterns and `focus_areas`, level-appropriate (a B1 learner gets "status update" before "investor grilling")
 - **1 × listen + discuss pair** — pick a real material by interests and level (podcast episode, YouTube talk; give title, link, duration ≤ 20 min) and schedule `discuss` 1–2 days after `listen`; attach 3 orienting questions to the listen entry
-- **1 × write** — work topic (investor update, team announcement, reply to an objection); executed by `/fluent-writing`
+- **1 × write** — a `weekly_reflection` by default, scheduled near the end of the learner's week (120–220 words about achievements, difficulties, lessons, and next-week focus). Use `daily_reflection` instead when a short 5–10 minute slot fits better. A clearly requested work-writing goal may replace the reflection.
 - **1–2 × review** — scale to SRS queue size; if the queue is nearly empty, drop to 1 and add a talk instead
 
 First-ever plan = **calibration week**: mark it as such in `goals`, keep it light, expect to adjust.
 
-**Monthly checkpoint:** roughly every 4 weeks, schedule one `/coach-intro` re-run as an activity — a transparent level re-measure. Compare with the previous verdict and say out loud what moved (this is the long-arc progress signal on the road to `target_level`).
+**Monthly checkpoint:** roughly every 4 weeks, schedule one internal `coach-intro` re-run — a transparent level re-measure. Compare with the previous verdict and say what moved.
 
-### 5. Confirm and write
+### 5. Write first, then summarize
 
-Show the week as a table (day / type / what / minutes). Apply edits conversationally. Then write `data/weekly-plan.json`:
+In autonomous mode, write `data/weekly-plan.json` immediately and show one concise natural-language summary of the next activity. Do not expose skill names or ask the learner to approve a command menu. When the learner explicitly asked to inspect or change the week, show a compact day/type/topic table and apply conversational edits.
 
 ```json
 {
@@ -72,7 +69,7 @@ Show the week as a table (day / type / what / minutes). Apply edits conversation
     {"id": "w29-1", "day": "mon", "type": "talk", "scenario": "status update call", "status": "planned", "session_ref": null},
     {"id": "w29-2", "day": "tue", "type": "listen", "source": {"title": "…", "url": "…", "duration_min": 15}, "questions": ["…", "…", "…"], "followup": "w29-3", "status": "planned"},
     {"id": "w29-3", "day": "wed", "type": "discuss", "about": "w29-2", "status": "planned"},
-    {"id": "w29-4", "day": "thu", "type": "write", "topic": "…", "status": "planned"},
+    {"id": "w29-4", "day": "sun", "type": "write", "format": "weekly_reflection", "topic": "reflect on this week", "prompts": ["What went well?", "What was difficult?", "What did you learn?", "What will you focus on next week?"], "length_words": {"min": 120, "max": 220}, "status": "planned", "session_ref": null},
     {"id": "w29-5", "day": "fri", "type": "review", "status": "planned"}
   ],
   "retro": {"completed_pct": null, "carried_over": [], "notes": ""}
@@ -86,4 +83,4 @@ Show the week as a table (day / type / what / minutes). Apply edits conversation
 - **Load ≤ daily_goal_minutes × available days.** An overloaded plan kills the habit; when in doubt, plan less.
 - **Real data only.** Scenarios come from actual error patterns and session notes, not generic curricula.
 - **A skip is data, not failure.** Retro tone is neutral; carried-over items get easier, not doubled.
-- **Clear intent only.** `/coach-plan` or an explicit ask to plan the week; it rewrites the plan file, so never fire from an ambiguous prompt.
+- **Safe automatic boundary.** Missing/stale plans may be generated automatically from real data. Never overwrite a current-week plan unless the learner clearly asks to replan it.

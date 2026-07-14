@@ -1,8 +1,7 @@
 ---
 name: fluent-writing
-description: Run an interactive writing practice session (emails, letters, forms, short texts) with systematic error analysis, category-tagged corrections, and detailed feedback. Triggered only when the learner types /fluent-writing. Selects a scenario matched to mastery, lets the learner compose, then analyzes grammar, register, vocabulary, structure, and spelling before updating all databases.
+description: Run writing practice or check a supplied text with systematic feedback and database updates. Invoked by a confirmed writing activity in the weekly plan or clear natural intent, including "подведём итоги дня/недели", "проверим дневник", "daily/weekly reflection", emails, and other short texts.
 allowed-tools: Read, Write, Bash
-disable-model-invocation: true
 ---
 
 # Writing Practice Session
@@ -13,9 +12,9 @@ Full-text writing practice with systematic correction. One scenario per session,
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-writing`. The skill is gated with `disable-model-invocation: true` — a 15-20 min interactive session with DB writes should never start from an ambiguous prompt.
+Run from a confirmed writing activity selected by `coach-today`, an unambiguous natural request to write, or a clear request to check a supplied journal/text. Do not auto-start merely because the learner pasted unrelated text; ask one short question if correction intent is unclear.
 
-Skip this skill in favor of `/fluent-vocab` if the learner has not yet hit mastery 2 in basic vocabulary — writing needs a minimum word bank.
+For journal-check mode, the supplied text is the answer: skip task generation and proceed directly to full-text analysis. For a planned activity, use its `format`, `topic`, `prompts`, and `length_words` instead of selecting a generic scenario.
 
 ## Instructions
 
@@ -27,19 +26,22 @@ python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/read-db.p
 
 Need: `learner-profile` (level, target language, focus areas), `mistakes-db` (weak writing patterns), `mastery-db` (writing sub-skills).
 
-### 2. Pick scenario type
+### 2. Resolve the writing format
 
-From `mastery-db.skills_mastery`:
+Use this precedence:
 
-- Formal email (if `writing_formal_email` mastery < 4)
-- Informal email (if `writing_informal_email` < 4)
-- Form filling (if `writing_forms` < 4)
-- Newsletter / personal text (if overall writing < 3)
-- Mixed scenarios (if all ≥ 4)
+1. **Supplied journal/text to check:** preserve it verbatim as the original answer; infer `daily_reflection` or `weekly_reflection` only when clear, otherwise label it `personal_text`.
+2. **Plan parameters:** obey `format`, `topic`, `prompts`, and `length_words`.
+3. **Clear reflection intent:**
+   - `daily_reflection` — 60–120 words: what happened, what went well or was difficult, what the learner felt or learned, and tomorrow's intention.
+   - `weekly_reflection` — 120–220 words: achievements, difficult moments, lessons, recurring communication problems, and next-week focus.
+4. **Other writing practice:** select by `mastery-db.skills_mastery`: formal email, informal email, form filling, personal text, then mixed scenarios as mastery rises.
 
-Scenarios must match the learner's CEFR level — A2 uses everyday situations, B1+ adds opinion / complaint / inquiry.
+Match every format to the learner's CEFR level. Reflections are personal records, not formal correspondence: never require greetings or closings, and prioritize clear chronology and natural expression.
 
-### 3. Present the task
+### 3. Present the task only when no text was supplied
+
+If the learner already supplied the journal/text to check, skip steps 3–4 and go directly to step 5 with that exact original text.
 
 ```markdown
 ## ✍️ Writing Exercise
@@ -59,9 +61,9 @@ Scenarios must match the learner's CEFR level — A2 uses everyday situations, B
 **Write your {text_type} below:**
 ```
 
-### 4. Wait for the full text
+### 4. Collect the full text when needed
 
-Don't correct mid-composition. Let the learner finish.
+For a newly assigned task, wait for the complete text and don't correct mid-composition. Let the learner finish.
 
 ### 5. Systematic error analysis
 
@@ -70,7 +72,7 @@ Check every sentence for these categories:
 1. **Grammar** — word order, conjugation, clause structure, articles
 2. **Formal/informal** — register consistency
 3. **Vocabulary** — wrong word, English mixing, register-wrong synonyms
-4. **Missing elements** — greeting, closing, required fields
+4. **Missing elements** — only elements required by this scenario; greetings and closings apply to correspondence, never to reflections
 5. **Spelling** — minor at A2, weightier at B2+
 6. **Structure** — organization, flow, paragraphing
 
@@ -117,13 +119,7 @@ Diverges slightly from the standard `fluent-feedback-formatter` template because
 
 ### 7. Optional rewrite
 
-If score < 7, offer:
-
-```markdown
-**Want to try again?** Rewriting with the corrections locks in the patterns.
-
-Type "rewrite" to try again, or "next" to continue.
-```
+If score < 7, naturally offer to rewrite the text using the corrections. Do not require a keyword or command; understand an ordinary yes/no response.
 
 ### 8. Session summary
 
@@ -217,7 +213,7 @@ Learner: "Hallo, Ik schrijf je omdat ik kan niet komen op donderdag. Ik ben ziek
 - **Wait for the full answer** before correcting.
 - **Severity tagging is mandatory.** Fed into `mistakes-db` and drives spaced repetition priority.
 - **Always save the session file** in `/results/` for later analysis by `fluent-session-analyzer`.
-- **Never auto-invoke.** This skill is gated; must fire only on explicit `/fluent-writing`.
+- **Invoke only with authorization.** A confirmed plan activity, clear writing/reflection request, or explicit request to check supplied text is sufficient. Ask one short question when intent is ambiguous.
 
 ## Language Reference
 

@@ -4,6 +4,30 @@ All notable changes are documented in this file. Entries tagged `-ec` are
 specific to the **english-coach** fork; upstream *fluent* releases are kept
 below them for reference.
 
+## [0.3.0-ec.3] — 2026-07-14
+
+### Added
+
+- **Zero-command learner interface:** natural Russian or English intent now starts
+  planning, conversation, writing, reading, vocabulary, review, progress, and
+  onboarding flows without requiring learner-facing slash commands.
+- `coach-today` autonomously creates a missing or stale weekly plan, treats
+  «начинаем» as confirmation, and launches the selected activity with its plan
+  parameters.
+- Daily reflections (60–120 words), weekly reflections (120–220 words), and
+  direct journal checking are first-class writing modes. Weekly planning
+  schedules a reflection by default.
+- Focused SessionStart tests cover command-free first contact, due-review
+  messaging, and plan launch through the natural «начинаем» intent.
+
+### Changed
+
+- Learner-facing startup, onboarding, empty-queue, progress, and README copy no
+  longer exposes internal skill names.
+- Automatic invocation is allowed only for a confirmed plan activity or clear
+  natural intent. Ambiguous text still requires one short clarification;
+  profile creation and reset retain explicit confirmation safeguards.
+
 ## [0.3.0-ec.2] — 2026-07-13
 
 ### Added

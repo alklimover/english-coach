@@ -1,7 +1,7 @@
 {
   "name": "english-coach",
-  "version": "0.3.0-ec.2",
-  "description": "English Coach — voice-first English trainer, a fork of Fluent (AI Language Learning Kit). Fluent core: spaced repetition (SM-2), active recall, adaptive difficulty, tracking across 6 databases. Adds a voice conversation loop (/talk) and a weekly coaching program. Daily practice: /talk, /fluent-review, /fluent-vocab, /fluent-writing, /fluent-reading. Start with /fluent-setup.",
+  "version": "0.3.0-ec.3",
+  "description": "English Coach — a zero-command, voice-first English tutor. It builds a weekly program, starts activities from natural Russian or English intent, remembers sessions across 6 local databases, schedules spaced review, and supports daily or weekly written reflections.",
   "author": {
     "name": "Mohammad Kermani",
     "url": "https://github.com/m98"

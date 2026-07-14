@@ -1,21 +1,20 @@
 ---
 name: fluent-learn
-description: Main adaptive language-learning session that mixes skills (writing, speaking, vocabulary, reading) and exercise types based on the learner's current level, weak patterns, and due reviews. Triggered only when the learner types /fluent-learn. Greets the learner, shows today's plan, asks what to practice, runs interleaved exercises one at a time, and updates all databases at the end.
+description: Run a mixed adaptive session across writing, conversation, vocabulary, and reading using the learner's level, weak patterns, and due reviews. Invoked by a confirmed mixed-practice activity or a clear request for a varied lesson; updates all learning databases at the end.
 allowed-tools: Read, Write, Bash
-disable-model-invocation: true
 ---
 
 # Main Adaptive Learning Session
 
 ## Overview
 
-The flagship command. Interleaves skills, adapts difficulty per answer, and covers the whole evidence-based loop: active recall → immediate feedback → spaced repetition → tracking. Typically runs 15-20 min, mixing 2-3 patterns to force discrimination.
+Interleaves skills, adapts difficulty per answer, and covers active recall → feedback → spaced repetition → tracking. Typically runs 15–20 minutes, mixing 2–3 patterns to force discrimination.
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-learn`. The skill is gated with `disable-model-invocation: true` — an ambiguous auto-trigger would launch a 20-min interactive session and mutate 6 JSON databases.
+Run only from a confirmed mixed-practice activity or an unambiguous request for a varied lesson. General readiness such as «начинаем» belongs to `coach-today`, which chooses from the plan.
 
-Skip this skill the very first time a learner runs the system — route to `/fluent-setup` instead.
+On first contact without a profile, offer natural-language setup instead of starting a lesson.
 
 ## Instructions
 
@@ -186,7 +185,7 @@ After 4 exercises, accuracy is 55% (target zone). Hold difficulty; introduce pat
 
 ## Critical Rules
 
-- **Never auto-invoke.** Gated; 15-20 min interactive + DB writes.
+- **Authorization boundary.** Start only from a confirmed mixed activity or clear request for varied practice; never from ambiguous text.
 - **Always load all 6 DBs at start.** Missing context → generic, demotivating content.
 - **One exercise at a time.**
 - **Interleave.** Don't drill one pattern for 20 min — mix 2-3 patterns to force discrimination.

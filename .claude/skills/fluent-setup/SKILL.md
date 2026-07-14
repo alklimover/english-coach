@@ -1,8 +1,7 @@
 ---
 name: fluent-setup
-description: One-time interactive onboarding that creates the learner's personalized language-learning profile — name, target language, native language, current/target CEFR level, timeline, daily minutes, and learning goals. Triggered only when the learner types /fluent-setup. Also handles profile updates and resets for returning users. Must never auto-invoke because re-running can reset progress.
+description: Create or update the learner profile through natural conversation. Invoked after explicit agreement to first-time setup or a clear request to change/reset profile data. Every write is confirmed; resetting progress requires double confirmation and a backup.
 allowed-tools: Read, Write, Bash, AskUserQuestion
-disable-model-invocation: true
 ---
 
 # Language Learning Setup
@@ -35,9 +34,9 @@ DATA = ensure_data_dir()
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-setup`. The skill is gated with `disable-model-invocation: true` — re-running can reset a learner's progress, so it must never auto-fire from an ambiguous prompt.
+For a new learner, run only after they agree to a natural prompt such as «давайте настроим репетитора». Before creating files, summarize what will be stored and ask for confirmation.
 
-Skip this skill if a profile already exists and the learner did not ask to change anything; route them to `/fluent-learn` or `/fluent-progress` instead.
+With an existing profile, invoke only from a clear request to update or reset it. If the learner merely wants to practise or see progress, route naturally to today's activity or the progress view instead.
 
 ## Instructions
 
@@ -136,17 +135,10 @@ Present:
 **Total study hours:** ~{hours} hours
 
 ### Weekly Schedule
-**Daily:**
-- 🔄 `/fluent-review` — spaced repetition ({X} min)
-- 📚 `/fluent-vocab` — new vocabulary ({Y} min)
 
-**Alternating:**
-- 📝 `/fluent-writing` (Mon/Wed/Fri)
-- 🗣️ `/fluent-speaking` (Tue/Thu/Sat)
-- 📖 `/fluent-reading` (Sun)
+The coach builds each week automatically from the learner's level, available time, due reviews, recent mistakes, and completed sessions. It mixes conversation, listening and discussion, writing or reflection, vocabulary, and review without asking the learner to choose tools.
 
-**Weekly:**
-- 📊 `/fluent-progress` — check stats (5 min)
+The only learner-facing action is to say «начинаем» or describe what they want naturally. Progress is summarized automatically at session start and available whenever they ask how things are going.
 
 ### Milestones
 - Month 1: {reasonable short-term}
@@ -155,10 +147,7 @@ Present:
 - Target date: {target_level}!
 
 ### Next Steps
-1. Start now — type `/fluent-learn`
-2. Daily habit — `/fluent-review` every day
-3. Weekly — `/fluent-progress` to see stats
-4. Stay consistent — even 10 min daily beats 2 hours weekly
+The profile is ready. Build the current week autonomously, then offer the first activity in one sentence. The learner should not have to remember a schedule or command.
 
 **Your journey to {target_language} fluency starts now!** 🚀
 ```
@@ -190,24 +179,11 @@ If yes, hand off to the `fluent-learn` skill.
 
 ## Profile Updates (existing profile)
 
-```markdown
-# 👋 Welcome back, {name}!
+If a profile exists, do only the action the learner requested. If the request is underspecified, ask one short natural question: whether they want to change goals/preferences, inspect the current plan, or reset progress. Never present a numbered command menu.
 
-You already have a learning profile.
-
-What would you like to do?
-
-1. **Update profile** — change goals, timeline, or preferences
-2. **View current plan** — see your learning schedule
-3. **Reset progress** — start fresh (⚠️ erases all progress!)
-4. **Cancel** — keep everything as is
-
-**Type 1, 2, 3, or 4:**
-```
-
-- **1** — ask which field, update only that field, preserve the rest.
-- **2** — render the plan section from current data. Read-only.
-- **3** — confirm twice. This deletes every file in the resolved data directory. Back up first:
+- **Update:** ask which field, update only that field, preserve the rest.
+- **View plan:** render the plan read-only.
+- **Reset:** state exactly how much history will be removed, confirm twice, then back up every JSON file before deletion:
 
   ```bash
   DATA_DIR="$(python3 -c "
@@ -221,13 +197,12 @@ What would you like to do?
   ```
 
   Then restart setup from Step 2.
-- **4** — exit cleanly.
 
 ## Examples
 
 ### Example 1 — first-time setup flow
 
-Learner runs `/fluent-setup`. After collecting all 11 answers, compute months, generate plan, write 6 JSON files, offer first lesson.
+Learner says «давайте настроим репетитора», agrees to create the local profile, and answers the onboarding questions. Then create the databases and offer the first lesson naturally.
 
 ### Example 2 — returning-user profile reset
 
@@ -243,8 +218,8 @@ Learner: "reset my progress, I want to start over"
 
 ## Critical Rules
 
-- **Never auto-invoke.** Re-running this can reset a learner's progress. Must be an explicit `/fluent-setup`.
-- **Confirm twice before reset.** "This will erase X days of progress, Y sessions, and Z mastered words. Proceed? (yes/no)".
+- **Natural intent plus confirmation.** First-time creation requires explicit agreement; updates require a clear requested field; reset requires double confirmation.
+- **Confirm twice before reset.** State the exact sessions, streak, and mastered items that will be erased, then require an explicit final confirmation.
 - **Always seed all 6 files** — every other skill assumes they exist.
 - **Back up before reset.** Hooks may not fire here; back up manually to `.backups/pre-reset-<timestamp>/`.
 - **Don't invent data.** Start every file empty — progress, mistakes, mastery all start at zero. The system builds up from real sessions.

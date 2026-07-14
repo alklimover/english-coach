@@ -1,8 +1,7 @@
 ---
 name: fluent-vocab
-description: Run an interactive vocabulary drill session with flashcard-style prompts, spaced repetition, and per-answer feedback. Triggered only when the learner types /fluent-vocab. Reads spaced-repetition / mistakes / mastery DBs to pick words, presents one word at a time, scores each answer, and calls fluent-db-updater at the end.
+description: Run an interactive vocabulary drill with active-recall prompts, spaced repetition, and per-answer feedback. Invoked by a confirmed vocabulary activity in the weekly plan or clear natural intent such as "потренируем слова" / "practice vocabulary"; updates the learning databases at the end.
 allowed-tools: Read, Write, Bash
-disable-model-invocation: true
 ---
 
 # Vocabulary Drill Session
@@ -13,9 +12,9 @@ Flashcard-style vocabulary practice using spaced repetition. One word at a time,
 
 ## When to Use
 
-Trigger this skill only when the learner types `/fluent-vocab`. The skill is gated with `disable-model-invocation: true` — a false-positive auto-trigger would launch a 15-min interactive session and mutate 6 JSON databases. Not worth the risk.
+Run only from a confirmed vocabulary activity selected by `coach-today` or an unambiguous natural request to practise words. An incidental mention of vocabulary is not authorization to start a drill.
 
-Skip this skill if no vocabulary items are due and no new words are queued — offer `/fluent-review` or `/fluent-learn` instead.
+If there are no due or queued words, naturally offer today's next planned activity without naming internal skills.
 
 ## Instructions
 
@@ -193,7 +192,7 @@ Learner: "to discuss about"
 - **Mix modes.** Don't drill 20 recognition prompts in a row — interleave for discrimination.
 - **Use target language** for greetings + transitions when the learner is B1+; for A1-A2 mix target + native.
 - **Never** update the DBs mid-session — batch at end.
-- **Never auto-invoke.** This skill is gated; must fire only on explicit `/fluent-vocab`.
+- **Authorization boundary.** Start only from a confirmed vocabulary activity or clear request to practise words.
 
 ## Tips for the Learner (append if they seem tired or unsure)
 
