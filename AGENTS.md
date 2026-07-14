@@ -87,7 +87,7 @@ The learner interface is **natural language**, not a command catalogue. `CLAUDE.
 |-------|---------|
 | `fluent-sm2-calculator` | SM-2 algorithm reference |
 | `fluent-feedback-formatter` | Canonical feedback template + severity tagging |
-| `fluent-db-updater` | Atomic session report persistence |
+| `fluent-db-updater` | Single end-of-session database batch with backup |
 | `fluent-session-analyzer` | Parse session results to plan future work |
 
 At session end, update the databases through `fluent-db-updater`; the learner should experience one continuous lesson, not a chain of tools.
@@ -126,7 +126,7 @@ At session end, update the databases through `fluent-db-updater`; the learner sh
 ### After Session
 
 1. Calculate statistics, meaningful errors, strengths, and next focus.
-2. Persist one atomic session report through `fluent-db-updater`.
+2. Submit one final session report through `fluent-db-updater`.
 3. Create the detailed result file in `results/`.
 4. Show a mode-appropriate summary. Voice feedback is delayed until this point.
 
@@ -249,7 +249,7 @@ You MUST implement these evidence-based methods:
    Translate to French:
    'I went to the market yesterday.'
 
-   Type your answer! ⏱️"
+   Give your answer when you're ready. ⏱️"
 
 6. Marie answers: "Je suis allé au marché hier."
 
@@ -265,14 +265,15 @@ You MUST implement these evidence-based methods:
 
    You're mastering past tense!"
 
-8. You update databases:
-   - progress-db.json → Add correct answer
-   - mastery-db.json → Increase past_tense mastery
-   - spaced-repetition.json → Update intervals
+8. You append the answer, score, and any real error to the in-memory session report.
+   Do not edit learning databases inside the question loop.
 
-9. Repeat steps 5-8 for next question
+9. Repeat steps 5-8 for the next question.
 
-10. After 10-15 questions, show summary:
+10. After 10-15 questions, persist the complete report once through
+    `fluent-db-updater`.
+
+11. Then show the summary:
     "## 🎉 Session Complete!
 
     Stats: 85% accuracy, 12/15 correct
@@ -294,7 +295,7 @@ You MUST implement these evidence-based methods:
 - ✅ Follow the selected activity's interaction cadence
 - ✅ Give immediate feedback for typed drills and delayed feedback for voice conversation
 - ✅ Accumulate review results and errors in one in-memory session report
-- ✅ Persist all database changes atomically at successful session end
+- ✅ Submit one final database batch at successful session end
 - ✅ Personalize content from real goals, history, and weak patterns
 - ✅ Apply the spaced-repetition algorithm to actual review answers
 
@@ -310,7 +311,7 @@ You MUST implement these evidence-based methods:
 
 ## 🔄 SM-2 Algorithm Implementation
 
-**When to calculate:** Score each answered review item in memory as the session runs; persist the complete `review_results` batch atomically at successful session end.
+**When to calculate:** Score each answered review item in memory as the session runs; submit the complete `review_results` batch once at successful session end.
 
 **Formula:**
 ```python
@@ -408,7 +409,7 @@ From `CLAUDE.md`, your personality is:
 3. Understand data structure (read `AGENTS.md` - you're here!)
 4. Wait for natural learner intent such as «начинаем», or offer first-time setup when no profile exists.
 5. Route internally using `CLAUDE.md` and the confirmed weekly-plan activity.
-6. Track completed sessions atomically in the databases.
+6. Track each completed session with one final database batch.
 7. Be concise, encouraging, and voice-first.
 
 ---
@@ -453,8 +454,8 @@ Before starting any session, verify:
 - [ ] Do I know their name and target language?
 - [ ] Have I checked spaced-repetition.json for due items?
 - [ ] Have I reviewed their weak patterns in mistakes-db.json?
-- [ ] Do I understand the command they're running?
-- [ ] Am I ready to track everything?
+- [ ] Do I understand the learner's natural intent or confirmed plan activity?
+- [ ] Am I ready to accumulate one session report and submit it once at the end?
 ```
 
 ---

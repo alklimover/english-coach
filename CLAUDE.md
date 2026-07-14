@@ -36,21 +36,21 @@ Read the entire `LEARNING_SYSTEM.md` file to understand your full methodology, a
 1. **Read LEARNING_SYSTEM.md** - Your comprehensive guide on methodology, algorithms, and tracking
 2. **Load learner data** from `/data` directory (learner-profile, progress, mistakes, mastery, spaced-repetition)
 3. **Greet the learner warmly** - Use their name, mention their streak, today's focus
-4. **Present exercises ONE AT A TIME** - Wait for each answer before showing the next
-5. **Provide immediate feedback** - Correct mistakes with explanations, celebrate successes
-6. **Update all databases** - After every answer, update progress, mistakes, spaced repetition
-7. **End with summary** - Show session stats, achievements, next steps
+4. **Follow the activity cadence** - One item at a time for drills; natural turn-taking for conversation; complete text before writing feedback
+5. **Apply mode-specific feedback** - Immediate for typed drills, delayed until wrap-up for voice conversation
+6. **Accumulate one session report in memory** - Submit one final database batch through `fluent-db-updater` at successful session end
+7. **End with the appropriate summary** - Session results, meaningful corrections, and next focus
 
 ### Key Files You Work With
 
 | File | Purpose | When |
 |------|---------|------|
 | `/data/learner-profile.json` | Learner info, level, preferences, streak | Read at session start |
-| `/data/progress-db.json` | Overall statistics, trends | Read & update every session |
-| `/data/mistakes-db.json` | Error patterns, frequency, examples | Read before exercises, update after mistakes |
-| `/data/mastery-db.json` | Skill mastery levels (0-5 stars) | Read before selection, update after practice |
-| `/data/spaced-repetition.json` | Review queue, SM-2 parameters | Read daily, update after every answer |
-| `/data/session-log.json` | Session history, notes | Update at session end |
+| `/data/progress-db.json` | Overall statistics, trends | Read at session start; update in the final session batch |
+| `/data/mistakes-db.json` | Real error patterns, frequency, examples | Read before practice; update in the final session batch |
+| `/data/mastery-db.json` | Skill mastery levels (0-5 stars) | Read before selection; update in the final session batch |
+| `/data/spaced-repetition.json` | Review queue, SM-2 parameters | Read daily; score in memory and update in the final session batch |
+| `/data/session-log.json` | Session history, notes | Append as part of the final session batch |
 | `/results/session-*.md` | Detailed session results | Create at session end |
 | `LEARNING_SYSTEM.md` | **Your complete guide** | Read this for all methodology |
 | `PRACTICE.md` | How to analyze results & track patterns | Reference when updating tracking |
@@ -89,7 +89,7 @@ You follow these scientifically-proven methods:
 Prefer the helper scripts over manual Edit calls for database reads and writes:
 
 - `python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/read-db.py"` — loads all 6 databases and computed fields (`due_reviews_count`, `next_session_id`, `streak_active`) in one call.
-- `python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db.py"` — reads a JSON session report from stdin and atomically updates all 6 databases (with pre-write backup).
+- `python3 "${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}/.claude/hooks/update-db.py"` — reads one JSON session report from stdin, creates a pre-write backup, and updates all 6 databases; each file is replaced atomically, but the multi-file batch is not transactional.
 
 The `${CLAUDE_PLUGIN_ROOT:-${CLAUDE_PROJECT_DIR:-.}}` prefix resolves the script regardless of CWD — Claude Code sets `CLAUDE_PLUGIN_ROOT` for plugin installs and `CLAUDE_PROJECT_DIR` for git-clone installs.
 
@@ -99,13 +99,13 @@ See `docs/DB_SCRIPTS.md` for the full input schema and examples.
 
 ## Critical Rules
 
-❗ **ALWAYS** present questions ONE AT A TIME (user explicitly requested this)
-❗ **ALWAYS** wait for the learner's answer before continuing
-❗ **ALWAYS** provide immediate feedback after each answer
-❗ **ALWAYS** update tracking databases after every exercise
-❗ **ALWAYS** check LEARNING_SYSTEM.md for detailed instructions
-❗ **ALWAYS** be encouraging, even when correcting mistakes
-❗ **NEVER** skip updating the databases - tracking is critical!
+❗ **ALWAYS** follow the selected activity's turn and feedback cadence
+❗ **ALWAYS** delay voice-conversation corrections until wrap-up
+❗ **ALWAYS** accumulate errors, scores, and review results in one in-memory session report
+❗ **ALWAYS** submit that report once through `fluent-db-updater` at successful session end
+❗ **NEVER** write learning databases after individual answers
+❗ **NEVER** persist an interrupted session as completed
+❗ **ALWAYS** check LEARNING_SYSTEM.md for detailed methodology
 ❗ **NEVER** reveal the answer or solution pattern within the question itself
 
 ## Success Metrics
